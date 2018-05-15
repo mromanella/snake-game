@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "module": "es6",
+        "outDir": "./dist/",
+        "noImplicitAny": true,
+        "target": "es2017",
+    },
+    "exclude": [
+        "./node_modules",
+    ]
+}
