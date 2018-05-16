@@ -40,37 +40,36 @@ export class Snake {
     }
 
     update() {
-        // update first block
-        let snakePart = this.snakeParts[0];
-        const newX = snakePart.x;
-        const newY = snakePart.y;
-        snakePart.lastX = newX;
-        snakePart.lastY = newY;
-        if (this.direction === 'right') {
-            snakePart.x = newX + SnakePart.partWidth;
-            if (snakePart.x >= 600) {
-                snakePart.x = 0;
-            }
-        } else if (this.direction === 'left') {
-            snakePart.x = newX - SnakePart.partWidth;
-            if (snakePart.x < 0) {
-                snakePart.x = 600 - SnakePart.partWidth;
-            }
-        } else if (this.direction === 'down') {
-            snakePart.y = newY + SnakePart.partWidth;
-            if (snakePart.y >= 400) {
-                snakePart.y = 0;
-            }
-        } else {
-            snakePart.y = newY - SnakePart.partWidth;
-            if (snakePart.y < 0) {
-                snakePart.y = 400 - SnakePart.partWidth;
-            }
-        }
-
-        // update the rest
         this.snakeParts.map((snakePart: SnakePart, index: number, snakeParts: SnakePart[]) => {
-            if (index !== 0) {
+            if (index === 0) {
+                // update first, changes direction
+                const newX = snakePart.x;
+                const newY = snakePart.y;
+                snakePart.lastX = newX;
+                snakePart.lastY = newY;
+                if (this.direction === 'right') {
+                    snakePart.x = newX + SnakePart.partWidth;
+                    if (snakePart.x >= 600) {
+                        snakePart.x = 0;
+                    }
+                } else if (this.direction === 'left') {
+                    snakePart.x = newX - SnakePart.partWidth;
+                    if (snakePart.x < 0) {
+                        snakePart.x = 600 - SnakePart.partWidth;
+                    }
+                } else if (this.direction === 'down') {
+                    snakePart.y = newY + SnakePart.partWidth;
+                    if (snakePart.y >= 400) {
+                        snakePart.y = 0;
+                    }
+                } else {
+                    snakePart.y = newY - SnakePart.partWidth;
+                    if (snakePart.y < 0) {
+                        snakePart.y = 400 - SnakePart.partWidth;
+                    }
+                }
+            } else {
+                // updating the rest
                 // save last location
                 snakePart.lastX = snakePart.x;
                 snakePart.lastY = snakePart.y;
@@ -100,9 +99,20 @@ export class Snake {
         } else {
             const secondToLast = this.snakeParts[this.snakeParts.length - 2];
             // second to last x is greater than last x we are moving to the right
-            const x = secondToLast
-        }
+            if (secondToLast.x > lastPart.x) {
+                newX -= SnakePart.partWidth;
+            } else if (secondToLast.x < lastPart.x) {
+                // second to last x less than last x moving to left
+                newX += SnakePart.partWidth;
+            } else if (secondToLast.y < lastPart.y) {
+                // second to last y less than last y moving up
+                newY -= SnakePart.partWidth;
+            } else {
+                // second to last y greater than last y moving down
+                newY += SnakePart.partWidth;
+            }
 
+        }
         const newPart = new SnakePart(this.ctx, newX, newY);
         this.snakeParts.push(newPart);
     }

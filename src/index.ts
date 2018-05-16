@@ -7,16 +7,16 @@ const fps = 1000 / 60;
 const gameSpeed = 350;
 let lastDraw: number = null;
 let snake = new Snake(ctx);
-snake.addNewPart();
-snake.addNewPart();
-snake.addNewPart();
-snake.addNewPart();
 
 window.onload = () => {
     setInterval((e: Event) => {
         snake.update();
     }, gameSpeed)
     requestAnimationFrame(main);
+
+    // setInterval((e:Event) => {
+    //     snake.addNewPart();
+    // }, 5000);
 }
 
 function main(runningTime: number) {
