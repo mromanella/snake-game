@@ -4,7 +4,7 @@
   "description": "Classic snake game",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "webpack-dev-server --open",
+    "dev": "webpack-dev-server --open --port 4000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matthew Romanella",

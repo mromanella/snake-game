@@ -2,119 +2,119 @@ import { SnakePart } from './snake-part';
 
 export class Snake {
     ctx: CanvasRenderingContext2D;
-    snakeParts: SnakePart[] = [];
+    body: SnakePart[] = [];
+    color: string;
     direction: string = 'down';
+    dimensions: any;
 
-    constructor(context2d: CanvasRenderingContext2D) {
+    constructor(context2d: CanvasRenderingContext2D, dimensions: any, color: string = '#000') {
         this.ctx = context2d;
-        const newPart = new SnakePart(this.ctx, 200, 100);
-        this.snakeParts.push(newPart);
-
-        // set up keyboard listeners
-        window.addEventListener('keydown', (e: KeyboardEvent) => {
-            e.stopPropagation();
-            if (e.keyCode === 40) {
-                if (this.direction !== 'up') {
-                    this.direction = 'down';
-                }
-            } else if (e.keyCode === 38) {
-                if (this.direction !== 'down') {
-                    this.direction = 'up';
-                }
-            } else if (e.keyCode === 39) {
-                if (this.direction !== 'left') {
-                    this.direction = 'right';
-                }
-            } else if (e.keyCode === 37) {
-                if (this.direction !== 'right') {
-                    this.direction = 'left';
-                }
-            }
-        });
+        this.dimensions = dimensions;
+        this.color = color;
+        const newPart = new SnakePart(this.ctx, 200, 100, this.color);
+        this.body.push(newPart);
     }
 
     draw() {
-        this.snakeParts.map((snakePart: SnakePart, index: number, snakeParts: SnakePart[]) => {
+        this.body.map((snakePart: SnakePart, index: number, snakeParts: SnakePart[]) => {
             snakePart.draw();
         });
     }
 
     update() {
-        this.snakeParts.map((snakePart: SnakePart, index: number, snakeParts: SnakePart[]) => {
+        this.body.map((snakePart: SnakePart, index: number, snakeParts: SnakePart[]) => {
             if (index === 0) {
-                // update first, changes direction
-                const newX = snakePart.x;
-                const newY = snakePart.y;
-                snakePart.lastX = newX;
-                snakePart.lastY = newY;
-                if (this.direction === 'right') {
-                    snakePart.x = newX + SnakePart.partWidth;
-                    if (snakePart.x >= 600) {
-                        snakePart.x = 0;
-                    }
-                } else if (this.direction === 'left') {
-                    snakePart.x = newX - SnakePart.partWidth;
-                    if (snakePart.x < 0) {
-                        snakePart.x = 600 - SnakePart.partWidth;
-                    }
-                } else if (this.direction === 'down') {
-                    snakePart.y = newY + SnakePart.partWidth;
-                    if (snakePart.y >= 400) {
-                        snakePart.y = 0;
-                    }
-                } else {
-                    snakePart.y = newY - SnakePart.partWidth;
-                    if (snakePart.y < 0) {
-                        snakePart.y = 400 - SnakePart.partWidth;
-                    }
-                }
+                // update first block(The head), changes direction
+                this.updateHead(snakePart);
             } else {
                 // updating the rest
-                // save last location
-                snakePart.lastX = snakePart.x;
-                snakePart.lastY = snakePart.y;
-                // update the the part infront of this ones last location
-                snakePart.x = snakeParts[index - 1].lastX;
-                snakePart.y = snakeParts[index - 1].lastY;
+                this.updateTail(snakePart, index, snakeParts);
             }
         });
     }
 
-    addNewPart() {
-        const lastPart = this.snakeParts[this.snakeParts.length - 1];
-        // if there is only 1 block add the new part onto the back
-        // using the current direction of snake as forward direction
-        let newX = lastPart.x;
-        let newY = lastPart.y;
-        if (this.snakeParts.length === 1) {
-            if (this.direction === 'right') {
-                newX -= SnakePart.partWidth;
-            } else if (this.direction === 'left') {
-                newX += SnakePart.partWidth;
-            } else if (this.direction === 'down') {
-                newY -= SnakePart.partWidth;
-            } else {
-                newY += SnakePart.partWidth;
+    private updateHead(snakePart: SnakePart) {
+        const newX = snakePart.x;
+        const newY = snakePart.y;
+        snakePart.lastX = newX;
+        snakePart.lastY = newY;
+        if (this.direction === 'right') {
+            snakePart.x = newX + SnakePart.partWidth;
+            if (snakePart.x >= this.dimensions.x) {
+                snakePart.x = 0;
+            }
+        } else if (this.direction === 'left') {
+            snakePart.x = newX - SnakePart.partWidth;
+            if (snakePart.x < 0) {
+                snakePart.x = this.dimensions.x - SnakePart.partWidth;
+            }
+        } else if (this.direction === 'down') {
+            snakePart.y = newY + SnakePart.partWidth;
+            if (snakePart.y >= this.dimensions.y) {
+                snakePart.y = 0;
             }
         } else {
-            const secondToLast = this.snakeParts[this.snakeParts.length - 2];
-            // second to last x is greater than last x we are moving to the right
-            if (secondToLast.x > lastPart.x) {
-                newX -= SnakePart.partWidth;
-            } else if (secondToLast.x < lastPart.x) {
-                // second to last x less than last x moving to left
-                newX += SnakePart.partWidth;
-            } else if (secondToLast.y < lastPart.y) {
-                // second to last y less than last y moving up
-                newY -= SnakePart.partWidth;
-            } else {
-                // second to last y greater than last y moving down
-                newY += SnakePart.partWidth;
+            snakePart.y = newY - SnakePart.partWidth;
+            if (snakePart.y < 0) {
+                snakePart.y = this.dimensions.y - SnakePart.partWidth;
             }
-
         }
-        const newPart = new SnakePart(this.ctx, newX, newY);
-        this.snakeParts.push(newPart);
     }
 
+    private updateTail(snakePart: SnakePart, index: number, body: SnakePart[]) {
+        // save last location
+        snakePart.lastX = snakePart.x;
+        snakePart.lastY = snakePart.y;
+        // update the the part infront of this ones last location
+        snakePart.x = body[index - 1].lastX;
+        snakePart.y = body[index - 1].lastY;
+    }
+
+    addNewPart() {
+        // if there is only 1 block add the new part onto the back
+        // using the current direction of snake as forward direction
+        let newPart: SnakePart = null;
+        const lastPart = this.body[this.body.length - 1];
+        if (this.body.length === 1) {
+            newPart = this.createAdjacentHeadPart(lastPart);
+        } else {
+            const secondToLast = this.body[this.body.length - 2];
+            newPart = this.createNewTailPart(lastPart, secondToLast);
+        }
+        console.log(`Adding x: ${newPart.x}, y: ${newPart.y}`);
+        newPart.color = 'green';
+        this.body.push(newPart);
+    }
+
+    private createAdjacentHeadPart(lastPart: SnakePart): SnakePart {
+        let newX = lastPart.x;
+        let newY = lastPart.y;
+        if (this.direction === 'right') {
+            newX -= SnakePart.partWidth;
+        } else if (this.direction === 'left') {
+            newX += SnakePart.partWidth;
+        } else if (this.direction === 'down') {
+            newY -= SnakePart.partWidth;
+        } else {
+            newY += SnakePart.partWidth;
+        }
+        return new SnakePart(this.ctx, newX, newY, this.color);
+    }
+
+    private createNewTailPart(lastPart: SnakePart, secondToLast: SnakePart): SnakePart {
+        let newX = lastPart.x;
+        let newY = lastPart.y;
+        const diffX = secondToLast.x - lastPart.x;
+        // second to last x is greater than last x we are moving to the right
+        if (diffX !== 0) {
+            // if not equal to 0 than we need to add it horizontally
+            newX += (Math.sign(diffX) * SnakePart.partWidth);
+        }
+        const diffY = secondToLast.y - lastPart.y;
+        if (diffY !== 0) {
+            newY += (Math.sign(diffY) * SnakePart.partWidth);
+        }
+
+        return new SnakePart(this.ctx, newX, newY, this.color);
+    }
 }
