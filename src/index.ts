@@ -3,6 +3,7 @@ import { SnakePart } from "./snake-part";
 
 const canvasEl: any = document.getElementById('game-window');
 const ctx: CanvasRenderingContext2D = canvasEl.getContext('2d');
+const scoreTag = document.getElementById('score');
 const center = canvasEl.height;
 const width = canvasEl.width;
 const height = canvasEl.height;
@@ -15,6 +16,7 @@ let lastKeyPressed = 39;
 let lastDraw: number = null;
 let snake = new Snake(ctx, dim);
 let food = randomizeFood();
+let score = 0;
 
 window.onload = () => {
     // interval of the snakes movement
@@ -26,6 +28,8 @@ window.onload = () => {
             snake.update();
 
             if (hasEatenFood()) {
+                score++;
+                scoreTag.innerHTML = String(score);
                 food = randomizeFood();
                 snake.addNewPart();
             }
@@ -54,13 +58,6 @@ window.onload = () => {
 
     // start
     requestAnimationFrame(animation);
-    // let addInt = setInterval((e:Event) => {
-    //     if (snake.body.length < 20) {
-    //         snake.addNewPart();
-    //     } else {
-    //         clearInterval(addInt);
-    //     }
-    // }, 1000);
 }
 
 function validateDirectionChange() {
@@ -98,7 +95,6 @@ function checkForCollision() {
     snake.body.slice(1).map((snakePart, index, snakeParts) => {
         if (index > 2 && snakePart.x === headX && snakePart.y === headY) {
             // collision detected
-            console.log(`headX ${headX}, headY ${headY} - ${snakePart.x}, ${snakePart.y}, index: ${index}`)
             gameRunning = false;
             snakePart.color = 'red';
             snakePart.draw();

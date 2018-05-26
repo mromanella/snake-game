@@ -82,7 +82,7 @@ export class Snake {
             newPart = this.createNewTailPart(lastPart, secondToLast);
         }
         console.log(`Adding x: ${newPart.x}, y: ${newPart.y}`);
-        newPart.color = 'green';
+        newPart.color = 'orange';
         this.body.push(newPart);
     }
 
