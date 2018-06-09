@@ -64,15 +64,19 @@ function setupControls() {
     if (mobileCheck()) {
         // setup button press listeners
         document.getElementById('up').onclick = (e: Event) => {
+            vibrate();
             setDirection(38);
         }
         document.getElementById('left').onclick = (e: Event) => {
+            vibrate();
             setDirection(37);
         }
         document.getElementById('down').onclick = (e: Event) => {
+            vibrate();
             setDirection(40);
         }
         document.getElementById('right').onclick = (e: Event) => {
+            vibrate();
             setDirection(39);
         }
 
