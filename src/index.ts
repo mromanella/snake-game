@@ -44,7 +44,7 @@ window.onload = () => {
  */
 function vibrate() {
     if (navigator.vibrate) {
-        navigator.vibrate(150);
+        navigator.vibrate(30);
     }
 }
 
