@@ -9,7 +9,8 @@ const width = canvasEl.width;
 const height = canvasEl.height;
 const dim = { x: width, y: height };
 const fps = 1000 / 30;
-const gameSpeed = 200;
+let gameSpeed = 500;
+let gameSpeedDelta = 10;
 let gameInterval: number = null;
 let gameRunning = true;
 let lastKeyPressed = 39;
@@ -150,27 +151,27 @@ function randomizeFood(): Food {
  * @returns true if collision, else false
  */
 function checkForCollision(): boolean {
-    let headX = snake.body[0].x;
-    let headY = snake.body[0].y;
-    snake.body.slice(1).map((snakePart, index, snakeParts) => {
+    const headX = snake.body[0].x;
+    const headY = snake.body[0].y;
+    for (let index = 1; index < snake.body.length; index++) {
+        let snakePart = snake.body[index];
         if (index > 2 && snakePart.x === headX && snakePart.y === headY) {
             // collision detected
             snakePart.color = 'red';
             snakePart.draw();
             return true;
         }
-    });
+    }
     return false;
 }
 
 /**
- * @description Checks too see if the food is within the head block
+ * @description Checks to see if the food is within the head block
  * @returns true if food was eaten, else false
  */
-function hasEatenFood(): boolean {
-    let head = snake.body[0];
-    if ((food.x >= head.x && food.x <= head.x + SnakePart.partWidth)
-        && (food.y >= head.y && food.y <= head.y + SnakePart.partWidth)) {
+function isPartOnFood(part: SnakePart): boolean {
+    if ((food.x >= part.x && food.x <= part.x + SnakePart.partWidth)
+        && (food.y >= part.y && food.y <= part.y + SnakePart.partWidth)) {
         return true;
     }
     return false;
@@ -187,9 +188,21 @@ function drawFood() {
 }
 
 /**
+ * @description Checks each body part to see if it is on food.
+ * @returns true if a part is on food, false if not
+ */
+function checkPartsForLocation() {
+    for (let part of snake.body) {
+        if (isPartOnFood(part)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * @description Main game loop and animation
  */
-
 function gameLoop() {
     // check to see if the last key pressed was a valid key press
     // ie. Not backwards
@@ -197,17 +210,28 @@ function gameLoop() {
         validateDirectionChange();
         snake.update();
 
-        if (hasEatenFood()) {
-            score++;
-            scoreTag.innerHTML = String(score);
-            food = randomizeFood();
-            snake.addNewPart();
-        }
-
         // check if collision, collision takes place if x and y of 
         // head === any other parts x and y  
         let collisionOccured = checkForCollision();
         gameRunning = !collisionOccured;
+
+        const head = snake.body[0];
+        if (isPartOnFood(head)) {
+            score++;
+            let scoreStr = String(score * 100);
+            scoreTag.innerHTML = scoreStr;
+            food = randomizeFood();
+            while (checkPartsForLocation()) {
+                food = randomizeFood();
+            }
+            snake.addNewPart();
+            if (gameSpeed > 100) {
+                gameSpeed -= (0.02 * (score * 100));
+                console.log(gameSpeed);
+                clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed)
+            }
+        }
     } else {
         clearInterval(gameInterval);
     }

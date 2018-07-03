@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "webpack-dev-server --open --port 4000",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matthew Romanella",

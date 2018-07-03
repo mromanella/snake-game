@@ -16,21 +16,22 @@ export class Snake {
     }
 
     draw() {
-        this.body.map((snakePart: SnakePart, index: number, snakeParts: SnakePart[]) => {
+        for (let snakePart of this.body) {
             snakePart.draw();
-        });
+        }
     }
 
     update() {
-        this.body.map((snakePart: SnakePart, index: number, snakeParts: SnakePart[]) => {
+        for (let index = 0; index < this.body.length; index++) {
+            let snakePart = this.body[index];
             if (index === 0) {
                 // update first block(The head), changes direction
                 this.updateHead(snakePart);
             } else {
                 // updating the rest
-                this.updateTail(snakePart, index, snakeParts);
+                this.updateTail(snakePart, index, this.body);
             }
-        });
+        }
     }
 
     private updateHead(snakePart: SnakePart) {
@@ -75,13 +76,12 @@ export class Snake {
         // using the current direction of snake as forward direction
         let newPart: SnakePart = null;
         const lastPart = this.body[this.body.length - 1];
-        if (this.body.length === 1) {
+        if (this.body.length <= 2) {
             newPart = this.createAdjacentHeadPart(lastPart);
         } else {
             const secondToLast = this.body[this.body.length - 2];
             newPart = this.createNewTailPart(lastPart, secondToLast);
         }
-        console.log(`Adding x: ${newPart.x}, y: ${newPart.y}`);
         newPart.color = 'orange';
         this.body.push(newPart);
     }
