@@ -1,6 +1,8 @@
 import { Snake } from "./snake";
 import { SnakePart } from "./snake-part";
 
+import './index.css';
+
 const canvasEl: any = document.getElementById('game-window');
 const ctx: CanvasRenderingContext2D = canvasEl.getContext('2d');
 const scoreTag = document.getElementById('score');
@@ -227,7 +229,6 @@ function gameLoop() {
             snake.addNewPart();
             if (gameSpeed > 150) {
                 gameSpeed -= (0.02 * (score * 100));
-                console.log(gameSpeed);
                 clearInterval(gameInterval);
                 gameInterval = setInterval(gameLoop, gameSpeed)
             }
