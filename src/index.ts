@@ -225,7 +225,7 @@ function gameLoop() {
                 food = randomizeFood();
             }
             snake.addNewPart();
-            if (gameSpeed > 100) {
+            if (gameSpeed > 150) {
                 gameSpeed -= (0.02 * (score * 100));
                 console.log(gameSpeed);
                 clearInterval(gameInterval);
