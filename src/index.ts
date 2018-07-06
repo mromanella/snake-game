@@ -1,23 +1,27 @@
-import { Snake } from "./snake";
+import { Snake, UP, DOWN, RIGHT, LEFT, KEYS } from "./snake";
 import { SnakePart } from "./snake-part";
 
 import './index.css';
 
-const canvasEl: any = document.getElementById('game-window');
-const ctx: CanvasRenderingContext2D = canvasEl.getContext('2d');
-const scoreTag = document.getElementById('score');
-const center = canvasEl.height;
-const width = canvasEl.width;
-const height = canvasEl.height;
-const dim = { x: width, y: height };
-const fps = 1000 / 30;
+const CANVAS_EL: any = document.getElementById('game-window');
+const CTX: CanvasRenderingContext2D = CANVAS_EL.getContext('2d');
+const SCORE_TAG = document.getElementById('score');
+// const CENTER = CANVAS_EL.height;
+const WIDTH = CANVAS_EL.width;
+const HEIGHT = CANVAS_EL.height;
+const DIM = { x: WIDTH, y: HEIGHT };
+const FPS = 1000 / 30;
+
 let gameSpeed = 500;
 let gameSpeedDelta = 10;
 let gameInterval: number = null;
 let gameRunning = true;
-let lastKeyPressed = 39;
+
+// randomize starting direction
+let lastKeyPressed = getRandomDirection();
+
 let lastDraw: number = null;
-let snake = new Snake(ctx, dim);
+let snake = new Snake(CTX, DIM, '#000', lastKeyPressed);
 let food = randomizeFood();
 let score = 0;
 
@@ -40,6 +44,13 @@ window.onload = () => {
 
     // start animating
     requestAnimationFrame(animation);
+}
+
+/**
+ * @description Gets a random key
+ */
+function getRandomDirection(): number {
+    return KEYS[Math.floor(Math.random() * KEYS.length)];
 }
 
 /**
@@ -68,19 +79,19 @@ function setupControls() {
         // setup button press listeners
         document.getElementById('up').onclick = (e: Event) => {
             vibrate();
-            setDirection(38);
+            setDirection(UP);
         }
         document.getElementById('left').onclick = (e: Event) => {
             vibrate();
-            setDirection(37);
+            setDirection(LEFT);
         }
         document.getElementById('down').onclick = (e: Event) => {
             vibrate();
-            setDirection(40);
+            setDirection(DOWN);
         }
         document.getElementById('right').onclick = (e: Event) => {
             vibrate();
-            setDirection(39);
+            setDirection(RIGHT);
         }
 
         // display buttons for direction controls
@@ -117,20 +128,20 @@ function setDirection(key: number) {
  */
 function validateDirectionChange() {
     if (lastKeyPressed === 40) {
-        if (snake.direction !== 'up') {
-            snake.direction = 'down';
+        if (snake.direction !== UP) {
+            snake.direction = DOWN;
         }
     } else if (lastKeyPressed === 38) {
-        if (snake.direction !== 'down') {
-            snake.direction = 'up';
+        if (snake.direction !== DOWN) {
+            snake.direction = UP;
         }
     } else if (lastKeyPressed === 39) {
-        if (snake.direction !== 'left') {
-            snake.direction = 'right';
+        if (snake.direction !== LEFT) {
+            snake.direction = RIGHT;
         }
     } else if (lastKeyPressed === 37) {
-        if (snake.direction !== 'right') {
-            snake.direction = 'left';
+        if (snake.direction !== RIGHT) {
+            snake.direction = LEFT;
         }
     }
 }
@@ -140,8 +151,8 @@ function validateDirectionChange() {
  */
 function randomizeFood(): Food {
     let food: Food = { x: 0, y: 0 };
-    let newFoodX = Math.floor(Math.random() * width);
-    let newFoodY = Math.floor(Math.random() * height);
+    let newFoodX = Math.floor(Math.random() * WIDTH);
+    let newFoodY = Math.floor(Math.random() * HEIGHT);
     food.x = newFoodX - (newFoodX % 10) + 5;
     food.y = newFoodY - (newFoodY % 10) + 5;
     return food;
@@ -183,10 +194,10 @@ function isPartOnFood(part: SnakePart): boolean {
  * @description Draws the food onto the canvas
  */
 function drawFood() {
-    ctx.beginPath();
-    ctx.fillStyle = 'black';
-    ctx.arc(food.x, food.y, 4, 0, 2 * Math.PI, false);
-    ctx.fill();
+    CTX.beginPath();
+    CTX.fillStyle = 'black';
+    CTX.arc(food.x, food.y, 4, 0, 2 * Math.PI, false);
+    CTX.fill();
 }
 
 /**
@@ -221,7 +232,7 @@ function gameLoop() {
         if (isPartOnFood(head)) {
             score++;
             let scoreStr = String(score * 100);
-            scoreTag.innerHTML = scoreStr;
+            SCORE_TAG.innerHTML = scoreStr;
             food = randomizeFood();
             while (checkPartsForLocation()) {
                 food = randomizeFood();
@@ -247,8 +258,8 @@ function animation(runningTime: number) {
     let diff = runningTime - lastDraw;
 
     if (gameRunning) {
-        if (diff / fps > 1) {
-            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        if (diff / FPS > 1) {
+            CTX.clearRect(0, 0, CANVAS_EL.width, CANVAS_EL.height);
             drawFood();
             snake.draw();
             lastDraw = runningTime;

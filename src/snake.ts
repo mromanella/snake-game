@@ -1,16 +1,24 @@
 import { SnakePart } from './snake-part';
 
+// directions
+export const UP = 38;
+export const LEFT = 37;
+export const DOWN = 40;
+export const RIGHT = 39;
+export const KEYS = [UP, LEFT, DOWN, RIGHT];
+
 export class Snake {
     ctx: CanvasRenderingContext2D;
     body: SnakePart[] = [];
     color: string;
-    direction: string = 'down';
+    direction: number;
     dimensions: any;
 
-    constructor(context2d: CanvasRenderingContext2D, dimensions: any, color: string = '#000') {
+    constructor(context2d: CanvasRenderingContext2D, dimensions: any, color: string = '#000', direction: number = RIGHT) {
         this.ctx = context2d;
         this.dimensions = dimensions;
         this.color = color;
+        this.direction = direction;
         const newPart = new SnakePart(this.ctx, 200, 100, this.color);
         this.body.push(newPart);
     }
@@ -29,7 +37,7 @@ export class Snake {
                 this.updateHead(snakePart);
             } else {
                 // updating the rest
-                this.updateTail(snakePart, index, this.body);
+                this.updateTail(snakePart, index);
             }
         }
     }
@@ -39,17 +47,17 @@ export class Snake {
         const newY = snakePart.y;
         snakePart.lastX = newX;
         snakePart.lastY = newY;
-        if (this.direction === 'right') {
+        if (this.direction === RIGHT) {
             snakePart.x = newX + SnakePart.partWidth;
             if (snakePart.x >= this.dimensions.x) {
                 snakePart.x = 0;
             }
-        } else if (this.direction === 'left') {
+        } else if (this.direction === LEFT) {
             snakePart.x = newX - SnakePart.partWidth;
             if (snakePart.x < 0) {
                 snakePart.x = this.dimensions.x - SnakePart.partWidth;
             }
-        } else if (this.direction === 'down') {
+        } else if (this.direction === DOWN) {
             snakePart.y = newY + SnakePart.partWidth;
             if (snakePart.y >= this.dimensions.y) {
                 snakePart.y = 0;
@@ -62,13 +70,13 @@ export class Snake {
         }
     }
 
-    private updateTail(snakePart: SnakePart, index: number, body: SnakePart[]) {
+    private updateTail(snakePart: SnakePart, index: number) {
         // save last location
         snakePart.lastX = snakePart.x;
         snakePart.lastY = snakePart.y;
         // update the the part infront of this ones last location
-        snakePart.x = body[index - 1].lastX;
-        snakePart.y = body[index - 1].lastY;
+        snakePart.x = this.body[index - 1].lastX;
+        snakePart.y = this.body[index - 1].lastY;
     }
 
     addNewPart() {
@@ -89,11 +97,11 @@ export class Snake {
     private createAdjacentHeadPart(lastPart: SnakePart): SnakePart {
         let newX = lastPart.x;
         let newY = lastPart.y;
-        if (this.direction === 'right') {
+        if (this.direction === RIGHT) {
             newX -= SnakePart.partWidth;
-        } else if (this.direction === 'left') {
+        } else if (this.direction === LEFT) {
             newX += SnakePart.partWidth;
-        } else if (this.direction === 'down') {
+        } else if (this.direction === DOWN) {
             newY -= SnakePart.partWidth;
         } else {
             newY += SnakePart.partWidth;
