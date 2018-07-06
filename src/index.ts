@@ -239,7 +239,7 @@ function gameLoop() {
             }
             snake.addNewPart();
             if (gameSpeed > 150) {
-                gameSpeed -= (0.03 * (score * 100));
+                gameSpeed -= (0.04 * (score * 100));
                 clearInterval(gameInterval);
                 gameInterval = setInterval(gameLoop, gameSpeed)
             }
