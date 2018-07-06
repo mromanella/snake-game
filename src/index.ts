@@ -113,10 +113,10 @@ function setupControls() {
  * @param key Keycode number
  */
 function setDirection(key: number) {
-    if (key === 40 ||
-        key === 38 ||
-        key === 39 ||
-        key === 37) {
+    if (key === UP ||
+        key === DOWN ||
+        key === LEFT ||
+        key === RIGHT) {
         lastKeyPressed = key;
     }
 }
@@ -127,19 +127,19 @@ function setDirection(key: number) {
  * move down without first going to one side.
  */
 function validateDirectionChange() {
-    if (lastKeyPressed === 40) {
+    if (lastKeyPressed === DOWN) {
         if (snake.direction !== UP) {
             snake.direction = DOWN;
         }
-    } else if (lastKeyPressed === 38) {
+    } else if (lastKeyPressed === UP) {
         if (snake.direction !== DOWN) {
             snake.direction = UP;
         }
-    } else if (lastKeyPressed === 39) {
+    } else if (lastKeyPressed === RIGHT) {
         if (snake.direction !== LEFT) {
             snake.direction = RIGHT;
         }
-    } else if (lastKeyPressed === 37) {
+    } else if (lastKeyPressed === LEFT) {
         if (snake.direction !== RIGHT) {
             snake.direction = LEFT;
         }
@@ -239,7 +239,7 @@ function gameLoop() {
             }
             snake.addNewPart();
             if (gameSpeed > 150) {
-                gameSpeed -= (0.02 * (score * 100));
+                gameSpeed -= (0.03 * (score * 100));
                 clearInterval(gameInterval);
                 gameInterval = setInterval(gameLoop, gameSpeed)
             }
