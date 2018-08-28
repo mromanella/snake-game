@@ -212,7 +212,7 @@ function checkPartsForLocation() {
 function updateGameSpeed(animator: Animator) {
     // Update gamespeed
     // animator.setFPS(animator.getFPS() + gameSpeedDelta);
-    if (animator.getFPS() < gameSpeedLimit && score % 5 !== 0) {
+    if (animator.getFPS() < gameSpeedLimit && score % 5 === 0) {
         animator.setFPS(animator.getFPS() + gameSpeedDelta);
     }
 }
