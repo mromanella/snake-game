@@ -6,7 +6,7 @@ import './index.css';
 
 const SCORE_TAG = document.getElementById('score');
 // const CENTER = CANVAS_EL.height;
-let gameSpeed = 2;
+let gameSpeed = 3;
 const gameSpeedDelta = 1;
 const gameSpeedLimit: number = 10;
 let gameRunning = true;
