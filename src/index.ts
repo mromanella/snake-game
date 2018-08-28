@@ -1,28 +1,26 @@
 import { Snake, UP, DOWN, RIGHT, LEFT, KEYS } from "./snake";
 import { SnakePart } from "./snake-part";
+import { Animator } from "./animator";
 
 import './index.css';
 
-const CANVAS_EL: any = document.getElementById('game-window');
-const CTX: CanvasRenderingContext2D = CANVAS_EL.getContext('2d');
 const SCORE_TAG = document.getElementById('score');
 // const CENTER = CANVAS_EL.height;
-const WIDTH = CANVAS_EL.width;
-const HEIGHT = CANVAS_EL.height;
-const DIM = { x: WIDTH, y: HEIGHT };
-const FPS = 1000 / 30;
-
-let gameSpeed = 500;
-let gameSpeedDelta = 10;
-let gameInterval: number = null;
+let gameSpeed = 2;
+const gameSpeedDelta = 1;
+const gameSpeedLimit: number = 10;
 let gameRunning = true;
+
+const FPS = gameSpeed;
+
+const CANVAS_ID = 'game-window';
 
 // randomize starting direction
 let lastKeyPressed = getRandomDirection();
 
 let lastDraw: number = null;
-let snake = new Snake(CTX, DIM, '#000', lastKeyPressed);
-let food = randomizeFood();
+let snake: Snake = null;
+let food: Food = null;
 let score = 0;
 
 
@@ -38,12 +36,10 @@ interface Food {
 window.onload = () => {
 
     setupControls();
-
-    // interval of the snakes movement
-    gameInterval = setInterval(gameLoop, gameSpeed)
-
-    // start animating
-    requestAnimationFrame(animation);
+    let animator = new Animator(CANVAS_ID, FPS, gameLoop);
+    food = randomizeFood(animator.canvasWidth, animator.canvasHeight);
+    snake = new Snake({ x: animator.canvasWidth, y: animator.canvasHeight }, '#000', lastKeyPressed);
+    animator.animate(0);
 }
 
 /**
@@ -149,10 +145,10 @@ function validateDirectionChange() {
 /**
  * @description Randomizes the location of the food and returns an object
  */
-function randomizeFood(): Food {
+function randomizeFood(width: number, height: number): Food {
     let food: Food = { x: 0, y: 0 };
-    let newFoodX = Math.floor(Math.random() * WIDTH);
-    let newFoodY = Math.floor(Math.random() * HEIGHT);
+    let newFoodX = Math.floor(Math.random() * width);
+    let newFoodY = Math.floor(Math.random() * height);
     food.x = newFoodX - (newFoodX % 10) + 5;
     food.y = newFoodY - (newFoodY % 10) + 5;
     return food;
@@ -163,7 +159,7 @@ function randomizeFood(): Food {
  * same location as a part of the body.
  * @returns true if collision, else false
  */
-function checkForCollision(): boolean {
+function checkForCollision(ctx: CanvasRenderingContext2D): boolean {
     const headX = snake.body[0].x;
     const headY = snake.body[0].y;
     for (let index = 1; index < snake.body.length; index++) {
@@ -171,7 +167,7 @@ function checkForCollision(): boolean {
         if (index > 2 && snakePart.x === headX && snakePart.y === headY) {
             // collision detected
             snakePart.color = 'red';
-            snakePart.draw();
+            snakePart.draw(ctx);
             return true;
         }
     }
@@ -193,11 +189,11 @@ function isPartOnFood(part: SnakePart): boolean {
 /**
  * @description Draws the food onto the canvas
  */
-function drawFood() {
-    CTX.beginPath();
-    CTX.fillStyle = 'black';
-    CTX.arc(food.x, food.y, 4, 0, 2 * Math.PI, false);
-    CTX.fill();
+function drawFood(ctx: CanvasRenderingContext2D) {
+    ctx.beginPath();
+    ctx.fillStyle = 'black';
+    ctx.arc(food.x, food.y, 4, 0, 2 * Math.PI, false);
+    ctx.fill();
 }
 
 /**
@@ -213,19 +209,30 @@ function checkPartsForLocation() {
     return false;
 }
 
+function updateGameSpeed(animator: Animator) {
+    // Update gamespeed
+    // animator.setFPS(animator.getFPS() + gameSpeedDelta);
+    if (animator.getFPS() < gameSpeedLimit && score % 5 !== 0) {
+        animator.setFPS(animator.getFPS() + gameSpeedDelta);
+    }
+}
+
 /**
  * @description Main game loop and animation
  */
-function gameLoop() {
+function gameLoop(ctx: CanvasRenderingContext2D, animator: Animator, ...rest: any[]) {
     // check to see if the last key pressed was a valid key press
     // ie. Not backwards
     if (gameRunning) {
         validateDirectionChange();
         snake.update();
 
+        drawFood(ctx);
+        snake.draw(ctx);
+
         // check if collision, collision takes place if x and y of 
         // head === any other parts x and y  
-        let collisionOccured = checkForCollision();
+        let collisionOccured = checkForCollision(ctx);
         gameRunning = !collisionOccured;
 
         const head = snake.body[0];
@@ -233,37 +240,14 @@ function gameLoop() {
             score++;
             let scoreStr = String(score * 100);
             SCORE_TAG.innerHTML = scoreStr;
-            food = randomizeFood();
+            food = randomizeFood(animator.canvasWidth, animator.canvasHeight);
             while (checkPartsForLocation()) {
-                food = randomizeFood();
+                food = randomizeFood(animator.canvasWidth, animator.canvasHeight);
             }
             snake.addNewPart();
-            if (gameSpeed > 150) {
-                gameSpeed -= (0.04 * (score * 100));
-                clearInterval(gameInterval);
-                gameInterval = setInterval(gameLoop, gameSpeed)
-            }
+            updateGameSpeed(animator);
         }
     } else {
-        clearInterval(gameInterval);
-    }
-}
-
-/**
- * @description Draws the snake and food onto the canvas
- * @param runningTime precise time
- */
-function animation(runningTime: number) {
-    if (!lastDraw) lastDraw = runningTime;
-    let diff = runningTime - lastDraw;
-
-    if (gameRunning) {
-        if (diff / FPS > 1) {
-            CTX.clearRect(0, 0, CANVAS_EL.width, CANVAS_EL.height);
-            drawFood();
-            snake.draw();
-            lastDraw = runningTime;
-        }
-        requestAnimationFrame(animation);
+        gameRunning = false;
     }
 }

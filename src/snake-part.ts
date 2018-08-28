@@ -11,15 +11,14 @@ export class SnakePart {
     color: string;
     moves: object[] = [];
 
-    constructor(context2d: CanvasRenderingContext2D, x: number, y: number, color: string = '#000') {
-        this.ctx = context2d;
+    constructor(x: number, y: number, color: string = '#000') {
         this.x = x;
         this.y = y;
         this.color = color;
     }
 
-    draw() {
-        this.ctx.fillStyle = this.color;
-        this.ctx.fillRect(this.x, this.y, SnakePart.partWidth, SnakePart.partWidth);
+    draw(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, SnakePart.partWidth, SnakePart.partWidth);
     }
 }

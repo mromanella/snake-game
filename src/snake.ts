@@ -8,24 +8,22 @@ export const RIGHT = 39;
 export const KEYS = [UP, LEFT, DOWN, RIGHT];
 
 export class Snake {
-    ctx: CanvasRenderingContext2D;
     body: SnakePart[] = [];
     color: string;
     direction: number;
     dimensions: any;
 
-    constructor(context2d: CanvasRenderingContext2D, dimensions: any, color: string = '#000', direction: number = RIGHT) {
-        this.ctx = context2d;
+    constructor(dimensions: any, color: string = '#000', direction: number = RIGHT) {
         this.dimensions = dimensions;
         this.color = color;
         this.direction = direction;
-        const newPart = new SnakePart(this.ctx, 200, 100, this.color);
+        const newPart = new SnakePart(200, 100, this.color);
         this.body.push(newPart);
     }
 
-    draw() {
+    draw(ctx: CanvasRenderingContext2D) {
         for (let snakePart of this.body) {
-            snakePart.draw();
+            snakePart.draw(ctx);
         }
     }
 
@@ -106,7 +104,7 @@ export class Snake {
         } else {
             newY += SnakePart.partWidth;
         }
-        return new SnakePart(this.ctx, newX, newY, this.color);
+        return new SnakePart(newX, newY, this.color);
     }
 
     private createNewTailPart(lastPart: SnakePart, secondToLast: SnakePart): SnakePart {
@@ -123,6 +121,6 @@ export class Snake {
             newY += (Math.sign(diffY) * SnakePart.partWidth);
         }
 
-        return new SnakePart(this.ctx, newX, newY, this.color);
+        return new SnakePart(newX, newY, this.color);
     }
 }
