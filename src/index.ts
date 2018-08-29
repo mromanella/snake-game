@@ -233,7 +233,6 @@ function gameLoop(ctx: CanvasRenderingContext2D, animator: Animator, ...rest: an
         // check if collision, collision takes place if x and y of 
         // head === any other parts x and y  
         let collisionOccured = checkForCollision(ctx);
-        animator.stopAnimating();
         gameRunning = !collisionOccured;
 
         const head = snake.body[0];
@@ -248,5 +247,7 @@ function gameLoop(ctx: CanvasRenderingContext2D, animator: Animator, ...rest: an
             snake.addNewPart();
             updateGameSpeed(animator);
         }
+    } else {
+        animator.stopAnimating();
     }
 }
