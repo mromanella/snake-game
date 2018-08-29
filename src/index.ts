@@ -227,9 +227,6 @@ function gameLoop(ctx: CanvasRenderingContext2D, animator: Animator, ...rest: an
         validateDirectionChange();
         snake.update();
 
-        drawFood(ctx);
-        snake.draw(ctx);
-
         // check if collision, collision takes place if x and y of 
         // head === any other parts x and y  
         let collisionOccured = checkForCollision(ctx);
@@ -250,4 +247,6 @@ function gameLoop(ctx: CanvasRenderingContext2D, animator: Animator, ...rest: an
     } else {
         animator.stopAnimating();
     }
+    drawFood(ctx);
+    snake.draw(ctx);
 }
