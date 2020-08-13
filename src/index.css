@@ -2,43 +2,27 @@
     border: 1px solid black;
 }
 
-.score-label, .score {
-    display: inline;
+.centered {
+    display: flex;
+    justify-content: center;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.space-between {
+    display: flex;
+    justify-content: space-between;
 }
 
 .score {
     padding-left: 0.5em;
 }
 
-.direction-controls {
-    width:250px;
-    visibility: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.up-down-btn, .left-right-btn {
-    width:100%;
-    align-self: center;
-    display: flex;
-    flex-direction: row; 
-}
-
-.up-down-btn {
-    justify-content: center;
-}
-
-.left-right-btn {
-    padding:5px;
-    justify-content:space-around;
-}
-
 .github-footer {
     text-align:center;
     bottom: 5px; 
     position:absolute;
-}
-
-button {
-    padding:20px;
 }

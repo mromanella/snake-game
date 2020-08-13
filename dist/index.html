@@ -11,18 +11,13 @@
     <script async defer src="bundle.js"></script>
 </head>
 <body>
-    <canvas id="game-window" class="game-window" height="250" width="250"></canvas>
-    <div><h3 class="score-label">Score:</h3><h2 id="score" class="score">0</h2></div>
-    <div id="direction-controls" class="direction-controls">
-        <div class="up-down-btn">
-                <button id="up"><i class="fa fa-arrow-up" aria-hidden="true"></i></button>
-        </div>
-        <div class="left-right-btn">
-            <button id="left"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
-            <button id="right"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
-        </div>
-        <div class="up-down-btn">
-                <button id="down"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
+    <div class="centered">
+        <div class="column">
+            <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
+            <div class="space-between">
+                <div id="player1-score" class="score-label">Player 1: 0</div>
+                <div id="player2-score" class="score-label">Player 2: 0</div>
+            </div>
         </div>
     </div>
     <footer class="github-footer">

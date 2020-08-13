@@ -1,0 +1,4 @@
+Add options
+* Auto speed increase or flat speed
+* Collide with walls
+* Multiple food

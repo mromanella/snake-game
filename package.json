@@ -1,22 +1,21 @@
 {
   "name": "snake-game",
   "version": "1.0.0",
-  "description": "Classic snake game",
+  "description": "The game of snake in TypeScript.",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "webpack-dev-server --open --port 4000",
-    "build": "webpack",
+    "dev": "webpack-dev-server --open",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matthew Romanella",
   "license": "ISC",
   "devDependencies": {
-    "css-loader": "^0.28.11",
-    "style-loader": "^0.21.0",
-    "ts-loader": "^4.1.0",
-    "typescript": "^2.7.2",
+    "css-loader": "^2.0.1",
+    "style-loader": "^0.23.1",
+    "ts-loader": "^5.3.1",
+    "typescript": "^3.2.2",
     "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.12",
+    "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.1"
   }
 }
