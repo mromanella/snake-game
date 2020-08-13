@@ -1,4 +1,5 @@
 Add options
+* Refactor
+* Singleplayer
+* Multiplayer
 * Auto speed increase or flat speed
-* Collide with walls
-* Multiple food
