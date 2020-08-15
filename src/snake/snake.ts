@@ -1,6 +1,5 @@
 import { SnakePart } from './snake-part';
-import { Line, Point } from '../animator/src/models';
-import { Food } from '../food/food';
+import { Point } from '../animator/src/models';
 
 export class Snake {
 
@@ -9,10 +8,10 @@ export class Snake {
     path: SnakePart[] = [];
     lastPath: SnakePart[] = [];
 
-    constructor(x: number, y: number) {
-        this.color = '#000';
+    constructor(x: number, y: number, color: string = '#000') {
+        this.color = color;
         this.direction = new Point(1, 0);
-        this.path.push(new SnakePart(200, 200, this.color));
+        this.path.push(new SnakePart(x, y, this.color));
     }
 
     setLastPath = () => {

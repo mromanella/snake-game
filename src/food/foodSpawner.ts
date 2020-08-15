@@ -1,5 +1,5 @@
 import { randomizeFood, Food } from './food';
-import { BoundingBox } from '../animator/src/models';
+import { GameObject } from '../animator/src/models';
 import { collision } from '../animator/index';
 import { SnakePart } from '../snake/snake-part';
 
@@ -16,24 +16,16 @@ export default class FoodSpawner {
         this.yMax = yMax;
     }
 
-    getBoundingBoxes = (): BoundingBox[] => {
-        const bb = [];
-        for (let food of this.foods) {
-            bb.push(food.getBoundingBox());
-        }
-        return bb;
-    }
-
-    spawn = (...notOn: BoundingBox[]) => {
+    spawn = (...notOn: GameObject[]) => {
         if (this.foods.length === this.numMax) {
             return;
         }
         while (true) {
-            notOn = [...notOn, ...this.getBoundingBoxes()]
+            notOn = [...notOn, ...this.foods]
             let ok = false;
             let food = randomizeFood(this.xMax, this.yMax);
-            for (let boundingBox of notOn) {
-                if (!collision.checkCollision(food.getBoundingBox(), boundingBox)) {
+            for (let gameObj of notOn) {
+                if (!collision.checkCollision(food, gameObj)) {
                     ok = true;
                     break;
                 }
@@ -53,17 +45,17 @@ export default class FoodSpawner {
         }
     }
 
-    removeEatenFoods = (snakeHead: SnakePart): number => {
+    removeEatenFoods = (snakeHead: SnakePart): boolean => {
         const filtered = [];
         for (let i = 0; i < this.foods.length; i++) {
             let food = this.foods[i];
-            if (!food.isEaten(snakeHead.getBoundingBox())) {
+            if (!food.isEaten(snakeHead)) {
                 filtered.push(food);
             }
         }
         let numEaten = this.foods.length - filtered.length;
         this.foods = filtered;
-        return numEaten;
+        return numEaten > 0;
     }
 
 }

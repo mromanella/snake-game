@@ -17,8 +17,8 @@
     justify-content: space-between;
 }
 
-.score {
-    padding-left: 0.5em;
+.hidden {
+    visibility: hidden;
 }
 
 .github-footer {

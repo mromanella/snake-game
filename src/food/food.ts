@@ -1,4 +1,4 @@
-import { Circle, BoundingBox } from "../animator/src/models";
+import { Circle, BoundingBox, GameObject } from "../animator/src/models";
 import { randomBetween } from "../animator/src/utils";
 import { collision } from "../animator/index";
 
@@ -11,8 +11,8 @@ export class Food extends Circle {
         super(x, y, 4, 'orange');
     }
 
-    isEaten = (boundingBox: BoundingBox): boolean => {
-        return collision.checkCollision(this.getBoundingBox(), boundingBox);
+    isEaten = (item: GameObject): boolean => {
+        return collision.checkCollision(this, item);
     }
 }
 

@@ -1,3 +1,6 @@
-import { init } from "./singleplayer";
+import { start } from "./singleplayer";
 
-init()
+// Display the settings
+
+
+const game = start();
