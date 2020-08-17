@@ -3,24 +3,31 @@ import FoodSpawner from './food/foodSpawner';
 
 import './index.css';
 import { Animator } from "./animator/src/models";
-import { INITIAL_GAME_SPEED, CANVAS_ID, CANVAS_WIDTH, CANVAS_HEIGHT, FPS, GAME_SPEED_DELTA } from './settings';
+import { CANVAS_ID, CANVAS_WIDTH, CANVAS_HEIGHT, FPS } from './settings';
 import {
-    collidedWithWall, collidedWithBody
+    collidedWithWall, collidedWithBody, setCanvasBorder, goThroughWall
 } from "./utils";
 import { Player } from "./player";
+import { setupPlayerControls } from "./controls";
+import { Key, unlockKeys, getKeyboardController } from "./animator/src/keyboard/index";
 
-let numFood = 1;
-let updateInterval: number = null;
-let gameSpeed = INITIAL_GAME_SPEED;
-
-const singlePlayer = (player: Player, foodSpawner: FoodSpawner) => {
+const gameLoop = (player: Player, playerKeys: Key[], foodSpawner: FoodSpawner, options: any) => {
     player.snake.update();
-
     const head = player.snake.getHead();
     // Check for game over conditions
     // Snake head colliding with wall
+    if (collidedWithWall(head)) {
+        if (options.collideWithWall) {
+            clearInterval(player.updateInterval);
+            player.gameOver();
+            return;
+        } 
+        // Otherwise 
+        goThroughWall(player.snake);
+    }
     // Snake head colliding with body
-    if (collidedWithWall(head) || collidedWithBody(head, player.snake)) {
+    if (collidedWithBody(head, player.snake)) {
+        clearInterval(player.updateInterval);
         player.gameOver();
         return;
     }
@@ -31,11 +38,13 @@ const singlePlayer = (player: Player, foodSpawner: FoodSpawner) => {
         player.snake.addPart();
         // Increment if some were eaten
         player.updateScore();
+        clearInterval(player.updateInterval);
+        player.updateInterval = setInterval(gameLoop, player.gameSpeed, player, playerKeys, foodSpawner, options);
     }
 
     // Spawn more
     foodSpawner.spawn(...player.snake.path);
-    player.controller.unlockAllLockedKeys();
+    unlockKeys(playerKeys);
 }
 
 /**
@@ -46,15 +55,25 @@ function drawLoop(ctx: CanvasRenderingContext2D, animator: Animator, snake: Snak
     snake.draw(ctx, true);
 }
 
-export const start = () => {
+export const start = (options: any) => {
+    const numFood = options.numFood;
     const snake = new Snake(200, 200);
     const foodSpawner = new FoodSpawner(numFood, CANVAS_WIDTH, CANVAS_HEIGHT);
     const animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snake, foodSpawner);
+
+    setCanvasBorder(options, animator);
+
+    const playerKeys = setupPlayerControls(1, snake);
+    const controller = getKeyboardController(playerKeys);
 
     const player = new Player(1, snake);
 
     foodSpawner.spawn(...snake.path);
     animator.resume();
-    player.controller.listen();
-    updateInterval = setInterval(singlePlayer, gameSpeed, player, foodSpawner);
+    controller.listen();
+    player.updateInterval = setInterval(gameLoop, player.gameSpeed, player, playerKeys, foodSpawner, options);
+}
+
+const cleanUp = () => {
+
 }

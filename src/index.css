@@ -1,5 +1,13 @@
 .game-window {
-    border: 1px solid black;
+    border: 1px black solid;
+}
+
+.solid {
+    border: inherit inherit solid;
+}
+
+.dashed {
+    border: 1px black dashed;
 }
 
 .centered {

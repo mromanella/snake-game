@@ -1,11 +1,10 @@
 import { Snake } from "./snake/snake";
-import { Point } from "./animator/src/models";
+import { Point, Animator } from "./animator/src/models";
 import Key from "./animator/src/keyboard/key";
-import { getDirectionForKey } from "./controls";
+import { getDirectionForKey, UP, DOWN, RIGHT, LEFT } from "./controls";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./settings";
 import { SnakePart } from "./snake/snake-part";
 import { collision } from "./animator/index";
-import { Player } from "./player";
 
 const validDirectionChange = (snake: Snake, newDirection: Point): boolean => {
     // Check to make sure that the new direction isn't 180 degrees in the opposite of 
@@ -48,8 +47,31 @@ export const collidedWithBody = (head: SnakePart, snake: Snake): boolean => {
     return false;
 }
 
-export const lockKeys = (keys: Key[]) => {
-    for (let key of keys) {
-        key.setLocked(true);
+const setCollideWithWallBorder = (animator: Animator) => {
+    animator.canvasEl.classList.add('solid');
+}
+
+const setPassThroughWallBorder = (animator: Animator) => {
+    animator.canvasEl.classList.add('dashed');
+}
+
+export const setCanvasBorder = (options: any, animator: Animator) => {
+    if (options.collideWithWall) {
+        setCollideWithWallBorder(animator);
+    } else {
+        setPassThroughWallBorder(animator);
+    }
+}
+
+export const goThroughWall = (snake: Snake) => {         
+    if (snake.direction.equals(UP)) {
+        snake.getHead().y = CANVAS_HEIGHT - SnakePart.partWidth;
+    } else if (snake.direction.equals(DOWN)) {
+        snake.getHead().y = 0;
+    } else if (snake.direction.equals(LEFT)) {
+        snake.getHead().x = CANVAS_WIDTH - SnakePart.partWidth;
+    } else {
+        // RIGHT
+        snake.getHead().x = 0;
     }
 }

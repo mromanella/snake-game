@@ -1,17 +1,17 @@
 import { Snake } from "./snake/snake";
 import Key from "./animator/src/keyboard/key";
 import { Point } from "./animator/src/models";
-import { keyNames, KeyboardController } from "./animator/src/keyboard/index";
-import { changeSnakeDirection, lockKeys } from "./utils";
+import { keyNames, lockKeys } from "./animator/src/keyboard/index";
+import { changeSnakeDirection } from "./utils";
 
 type _DIRECTIONS = {
     [key: string]: Point
 }
 
-const UP = new Point(0, -1);
-const DOWN = new Point(0, 1);
-const LEFT = new Point(-1, 0);
-const RIGHT = new Point(1, 0);
+export const UP = new Point(0, -1);
+export const DOWN = new Point(0, 1);
+export const LEFT = new Point(-1, 0);
+export const RIGHT = new Point(1, 0);
 
 const DIRECTIONS_MAP: _DIRECTIONS = {
     [keyNames.W]: UP,
@@ -44,7 +44,7 @@ export const getPlayer2Keys = (): Key[] => {
     return [upArrow, downArrow, leftArrow, rightArrow];
 }
 
-export const setupPlayerControls = (snake: Snake, playerNumber: number): KeyboardController => {
+export const setupPlayerControls = (playerNumber: number, snake: Snake): Key[] => {
     let playerKeys = getPlayer1Keys();
     if (playerNumber === 2) {
         playerKeys = getPlayer2Keys();
@@ -60,5 +60,5 @@ export const setupPlayerControls = (snake: Snake, playerNumber: number): Keyboar
         })
     }
 
-    return new KeyboardController(playerKeys);
+    return playerKeys;
 }

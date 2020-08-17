@@ -1,8 +1,6 @@
 import { Snake } from "./snake/snake";
 import { KeyboardController } from "./animator/src/keyboard/index";
-import FoodSpawner from "./food/foodSpawner";
-import { collidedWithWall, collidedWithBody } from "./utils";
-import { setupPlayerControls } from "./controls";
+import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT } from "./settings";
 
 export class Player {
 
@@ -12,11 +10,12 @@ export class Player {
     score: number = 0;
     scoreTag: HTMLElement;
     alive: boolean = true;
+    gameSpeed: number = INITIAL_GAME_SPEED;
+    updateInterval: number = null;
 
     constructor(num: number, snake: Snake) {
         this.num = num;
         this.snake = snake;
-        this.controller = setupPlayerControls(this.snake, this.num);
         this.initScoreTag();
     }
 
@@ -49,6 +48,11 @@ export class Player {
         for (let snakePart of this.snake.path) {
             snakePart.color = 'red';
         }
-        this.controller.stopListening();
+    }
+
+    updateGameSpeed = () => {
+        if (this.gameSpeed > GAME_SPEED_LIMIT) {
+            this.gameSpeed -= GAME_SPEED_DELTA;
+        }
     }
 }
