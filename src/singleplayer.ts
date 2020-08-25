@@ -15,21 +15,22 @@ const gameLoop = (player: Player, playerKeys: Key[], foodSpawner: FoodSpawner, o
     player.snake.update();
     const head = player.snake.getHead();
     // Check for game over conditions
+    // Snake head colliding with body
+    if (collidedWithBody(head, player.snake)) {
+        clearInterval(player.updateInterval);
+        player.gameOver();
+        return;
+    }
+
     // Snake head colliding with wall
     if (collidedWithWall(head)) {
         if (options.collideWithWall) {
             clearInterval(player.updateInterval);
             player.gameOver();
             return;
-        } 
+        }
         // Otherwise 
         goThroughWall(player.snake);
-    }
-    // Snake head colliding with body
-    if (collidedWithBody(head, player.snake)) {
-        clearInterval(player.updateInterval);
-        player.gameOver();
-        return;
     }
 
     // Remove eaten foods
