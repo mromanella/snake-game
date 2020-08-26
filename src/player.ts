@@ -1,11 +1,13 @@
 import { Snake } from "./snake/snake";
-import { KeyboardController } from "./animator/src/keyboard/index";
+import { KeyboardController, Key, unlockKeys, lockKeys } from "./animator/src/keyboard/index";
 import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT } from "./settings";
+import { changeSnakeDirection } from "./utils";
 
 export class Player {
 
     num: number = 1;
     snake: Snake;
+    keys: Key[];
     controller: KeyboardController;
     score: number = 0;
     scoreTag: HTMLElement;
@@ -13,10 +15,24 @@ export class Player {
     gameSpeed: number = INITIAL_GAME_SPEED;
     updateInterval: number = null;
 
-    constructor(num: number, snake: Snake) {
+    constructor(num: number, snake: Snake, keys: Key[]) {
         this.num = num;
         this.snake = snake;
+        this.keys = keys;
         this.initScoreTag();
+        this.initKeys();
+    }
+
+    initKeys = () => {
+        // Init the keys
+        for (let key of this.keys) {
+            key.addKeyPress((key: Key) => {
+                const valid = changeSnakeDirection(this.snake, key);
+                if (valid) {
+                   this.lockKeys();
+                }
+            })
+        }
     }
 
     initScoreTag = () => {
@@ -42,9 +58,19 @@ export class Player {
         this.scoreTag.innerText = `Player ${this.num}: ${this.score}`;
     }
 
-    gameOver = () => {
+    lockKeys = () => {
+        lockKeys(this.keys);
+    }
+
+    unlockKeys = () => {
+        unlockKeys(this.keys);
+    }
+
+    gameOver = (useLastPath: boolean = false) => {
         this.alive = false;
-        this.snake.path = this.snake.lastPath;
+        if (useLastPath) {
+            this.snake.path = this.snake.lastPath;
+        }
         for (let snakePart of this.snake.path) {
             snakePart.color = 'red';
         }

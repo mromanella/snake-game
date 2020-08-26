@@ -43,22 +43,3 @@ export const getPlayer2Keys = (): Key[] => {
     const rightArrow = new Key(keyNames.ARROW_RIGHT);
     return [upArrow, downArrow, leftArrow, rightArrow];
 }
-
-export const setupPlayerControls = (playerNumber: number, snake: Snake): Key[] => {
-    let playerKeys = getPlayer1Keys();
-    if (playerNumber === 2) {
-        playerKeys = getPlayer2Keys();
-    }
-
-    // Init the keys
-    for (let key of playerKeys) {
-        key.addKeyPress((key: Key) => {
-            const valid = changeSnakeDirection(snake, key);
-            if (valid) {
-                lockKeys(playerKeys);
-            }
-        })
-    }
-
-    return playerKeys;
-}

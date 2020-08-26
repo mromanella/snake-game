@@ -8,10 +8,12 @@ import {
     collidedWithWall, collidedWithBody, setCanvasBorder, goThroughWall
 } from "./utils";
 import { Player } from "./player";
-import { setupPlayerControls } from "./controls";
-import { unlockKeys, Key, getKeyboardController } from "./animator/src/keyboard/index";
+import { getPlayer1Keys, getPlayer2Keys } from "./controls";
+import { getKeyboardController } from "./animator/src/keyboard/index";
+import { collision } from "./animator/index";
+import { Game } from "./game";
 
-const gameLoop = (player: Player, otherPlayer: Player, playerKeys: Key[], foodSpawner: FoodSpawner, options: any) => {
+const playerUpdateLoop = (player: Player, otherPlayer: Player, game: Game) => {
     player.snake.update();
     const head = player.snake.getHead();
     // Check for game over conditions
@@ -21,14 +23,34 @@ const gameLoop = (player: Player, otherPlayer: Player, playerKeys: Key[], foodSp
         clearInterval(player.updateInterval);
         clearInterval(otherPlayer.updateInterval);
         player.gameOver();
+        game.running = false;
         return;
     }
 
+    // Snake head collide with other snake's head or body
+    if (collision.checkCollision(head, otherPlayer.snake.getHead())) {
+        // Everyone loses
+        clearInterval(player.updateInterval);
+        clearInterval(otherPlayer.updateInterval);
+        player.gameOver();
+        otherPlayer.gameOver();
+        game.running = false;
+    }
+    if (collidedWithBody(head, otherPlayer.snake)) {
+            clearInterval(player.updateInterval);
+            clearInterval(otherPlayer.updateInterval);
+            player.gameOver();
+            game.running = false;
+            return;
+        }
+
     // Snake head colliding with wall
     if (collidedWithWall(head)) {
-        if (options.collideWithWall) {
+        if (game.options.collideWithWall) {
             clearInterval(player.updateInterval);
-            player.gameOver();
+            clearInterval(otherPlayer.updateInterval);
+            player.gameOver(true);
+            game.running = false;
             return;
         } 
         // Otherwise 
@@ -36,18 +58,18 @@ const gameLoop = (player: Player, otherPlayer: Player, playerKeys: Key[], foodSp
     }
 
     // Remove eaten foods
-    const wasEaten = foodSpawner.removeEatenFoods(head);
+    const wasEaten = game.foodSpawner.removeEatenFoods(head);
     if (wasEaten) {
         player.snake.addPart();
         // Increment if some were eaten
         player.updateScore();
         clearInterval(player.updateInterval);
-        player.updateInterval = setInterval(gameLoop, player.gameSpeed, player, otherPlayer, playerKeys, foodSpawner, options);
+        player.updateInterval = setInterval(playerUpdateLoop, player.gameSpeed, player, otherPlayer, game);
     }
 
     // Spawn more
-    foodSpawner.spawn(...player.snake.path, ...otherPlayer.snake.path);
-    unlockKeys(playerKeys);
+    game.foodSpawner.spawn(...player.snake.path, ...otherPlayer.snake.path);
+    player.unlockKeys();
 }
 
 /**
@@ -60,7 +82,7 @@ function drawLoop(ctx: CanvasRenderingContext2D, animator: Animator, player1Snak
     player2Snake.draw(ctx, true);
 }
 
-export const start = (options: any) => {
+export const start = (options: any): Game => {
     const numFood = options.numFood;
     const player1Snake = new Snake(200, 150);
     const player2Snake = new Snake(200, 250, 'blue');
@@ -69,18 +91,28 @@ export const start = (options: any) => {
 
     setCanvasBorder(options, animator);
 
-    const player1Keys = setupPlayerControls(1, player1Snake);
-    const player2Keys = setupPlayerControls(2, player2Snake);
+    const player1Keys = getPlayer1Keys();
+    const player2Keys = getPlayer2Keys();
     const controller = getKeyboardController([...player1Keys, ...player2Keys]);
 
-    const player1 = new Player(1, player1Snake);
-    const player2 = new Player(2, player2Snake);
+    const player1 = new Player(1, player1Snake, player1Keys);
+    const player2 = new Player(2, player2Snake, player2Keys);
 
     foodSpawner.spawn(...player1Snake.path, ...player2Snake.path);
     animator.resume();
     controller.listen();
-    player1.updateInterval = setInterval(gameLoop, player1.gameSpeed, player1, player2, player1Keys, foodSpawner, options);
-    player2.updateInterval = setInterval(gameLoop, player2.gameSpeed, player2, player1, player2Keys, foodSpawner, options);
+    const game: Game = {
+        player1: player1,
+        player2: player2,
+        foodSpawner: foodSpawner,
+        controller: controller,
+        animator: animator,
+        running: true,
+        options: options
+    }
+    player1.updateInterval = setInterval(playerUpdateLoop, player1.gameSpeed, player1, player2, game);
+    player2.updateInterval = setInterval(playerUpdateLoop, player2.gameSpeed, player2, player1, game);
+    return game;
 }
 
 const cleanUp = () => {
