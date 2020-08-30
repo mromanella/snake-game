@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!-- <base href="/projects/snake/"> -->
     <base href="/">
@@ -8,65 +9,80 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://use.fontawesome.com/591eaa7791.js"></script>
     <title>Snake Game</title>
-    <script async defer src="bundle.js"></script>
 </head>
-<body class="centered">
 
-    <h1 class="main-title">Snake Game!</h1>
+<body>
+    <main style="margin: 0 10%">
+        <h1 class="main-title">Snake Game!</h1>
+        <section class="description">
+            <ul>
+                <li>The first valid direction key pressed by a player will be used, so make it count!</li>
+                <li>The snakes grow and their speed increases as they eat food.</li>
+                <li>2 player games end when one player causes the other to collide with the wall or snake body.</li>
+            </ul>
+        </section>
 
-    <section class="game-options">
-        <div>
+        <section class="game-options">
+            <div class="centered">
+                <h3>Game Options</h3>
+                <div title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. 
+                The second player is the blue snake and uses the arrow keys to move.">
+                    <label for="numPlayers">Number of players: </label>
+                    <select id="numPlayers" class="numPlayers option" name="numPlayers">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </div>
 
-            <div >
-                <label for="numPlayers">Number of players: </label>
-                <select id="numPlayers" class="numPlayers option" name="numPlayers">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                </select>
+                <div title="Sets the number of food which is on the board at a time. More food will spawn
+                once all food has been cleared.">
+                    <label for="numFood">Number of food: </label>
+                    <select id="numFood" class="numFood option" name="numFood">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+                <div title="Sets the collide with wall option. If this is off then the snake will go into the
+                 wall and come out of the opposite wall instead of losing.">
+                    <label for="collideWithWall">Collide with wall: </label>
+                    <select id="collideWithWall" class="collideWithWall option" name="collideWithWall">
+                        <option value="true">On</option>
+                        <option value="false">Off</option>
+                    </select>
+                </div>
+
+                <div class="centered">
+                    <button id="play-button" class="play-button">Play!</button>
+                </div>
             </div>
-            <div >
-                <label for="numFood">Number of food: </label>
-                <select id="numFood" class="numFood option" name="numFood">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
-            </div>
-            <div >
-                <label for="collideWithWall">Collide with wall: </label>
-                <select id="collideWithWall" class="collideWithWall option" name="collideWithWall">
-                    <option value="true">On</option>
-                    <option value="false">Off</option>
-                </select>
-            </div>
+        </section>
 
-        </div>
-        <div class="centered">
-            <button id="play-button" class="play-button">Play!</button>
-        </div>
-    </section>
-
-    <section id="play-area" class="hidden">
-        <div>
-            <button id="quit-button" class="play-button">Quit game</button>
-        </div>
-        <div class="column">
-            <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
-            <div class="space-between">
-                <div id="player1-score" class="score-label hidden">Player 1: 0</div>
-                <div id="player2-score" class="score-label hidden">Player 2: 0</div>
+        <section id="play-area" class="hidden centered">
+            <div>
+                <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
+                <div class="space-between">
+                    <div id="player1-score" class="score-label hidden">Player 1: 0</div>
+                    <div id="player2-score" class="score-label hidden">Player 2: 0</div>
+                </div>
             </div>
-        </div>
-    </section>
+            <div class="centered">
+                <button id="quit-button" class="play-button">Quit game</button>
+            </div>
+        </section>
+
+    </main>
     <footer class="github-footer">
         <a href="https://github.com/mromanella/snake-game">Source code</a>
     </footer>
+    <script src="bundle.js"></script>
 </body>
+
 </html>

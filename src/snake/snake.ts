@@ -10,7 +10,7 @@ export class Snake {
 
     constructor(x: number, y: number, color: string = '#000') {
         this.color = color;
-        this.direction = new Point(1, 0);
+        this.direction = new Point(0, 0);
         this.path.push(new SnakePart(x, y, this.color));
     }
 
@@ -54,13 +54,15 @@ export class Snake {
             // Add on the opposite direction where we are going
             let head = this.getHead();
             let newPt = head.add(this.direction.multiply(-SnakePart.partWidth));
-            this.path.push(new SnakePart(newPt.x, newPt.y, this.color));
+            let part = new SnakePart(newPt.x, newPt.y, this.color);
+            this.path.push(part);
         } else {
             // Add on the opposite direction from the second to last part
             let pt1 = this.path[this.path.length - 2];
             let pt2 = this.getTail();
             let newPt = pt2.add(pt1.diff(pt2).direction().multiply(-SnakePart.partWidth));
-            this.path.push(new SnakePart(newPt.x, newPt.y, this.color)); 
+            let part = new SnakePart(newPt.x, newPt.y, this.color);
+            this.path.push(part); 
         }
     }
 

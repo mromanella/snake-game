@@ -2,7 +2,7 @@ import { Snake } from "./snake/snake";
 import { Point, Animator } from "./animator/src/models";
 import Key from "./animator/src/keyboard/key";
 import { getDirectionForKey, UP, DOWN, RIGHT, LEFT } from "./controls";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./settings";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
 import { collision } from "./animator/index";
 
@@ -85,13 +85,16 @@ export const getScoreTag = (num: number) => {
 }
 
 export const initScoreTag = (num: number) => {
-    getScoreTag(num).classList.remove('hidden');
+    const scoreTag = getScoreTag(num);
+    scoreTag.classList.remove('hidden');
 }
 
 export const hideScoreTag = (num: number) => {
-    getScoreTag(num).classList.add('hidden');
+    const scoreTag = getScoreTag(num);
+    scoreTag.classList.add('hidden');
 }
 
 export const updateScoreText = (num: number, score: number) => {
-    getScoreTag(num).innerText = `Player ${num}: ${score}`;
+    const scoreTag = getScoreTag(num);
+    scoreTag.innerText = `Player ${num}: ${score}`;
 }

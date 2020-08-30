@@ -13,7 +13,6 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
         numFood: Number(numFoodEl.value), 
         collideWithWall: collideWithWallEl.value === 'true' ? true : false
     }
-    console.log(collideWithWallEl.value)
     document.querySelector('.game-options').classList.add('hidden');
     const game = createGame(options);
     startGame(game);
@@ -23,19 +22,3 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
         document.querySelector('.game-options').classList.remove('hidden');
     });
 })
-
-// const game = createGame(options);
-// startGame(game);
-// let gameInterval = setInterval(() => {
-//     if (!game.running) {
-//         if (game.player1.alive) {
-//             console.log('player2 lost!');
-//         } else if (game.player2.alive) {
-//             console.log('player1 lost!');
-//         } else {
-//             console.log('draw!');
-//         }
-//         clearInterval(gameInterval);
-//     }
-// }, INITIAL_GAME_SPEED + 500)
-// endGame(game);

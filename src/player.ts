@@ -1,16 +1,16 @@
 import { Snake } from "./snake/snake";
-import { KeyboardController, Key, unlockKeys, lockKeys } from "./animator/src/keyboard/index";
-import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT } from "./settings";
-import { changeSnakeDirection, collidedWithBody, goThroughWall, collidedWithWall } from "./utils";
+import { Key, unlockKeys, lockKeys } from "./animator/src/keyboard/index";
+import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT } from "./constants";
+import { changeSnakeDirection, collidedWithBody, goThroughWall, collidedWithWall, updateScoreText } from "./utils";
 import { Game } from "./game";
 import { collision } from "./animator/index";
+import { Point } from "./animator/src/models";
 
 export class Player {
 
     num: number = 1;
     snake: Snake;
     keys: Key[];
-    controller: KeyboardController;
     score: number = 0;
     alive: boolean = true;
     updateSpeed: number = INITIAL_GAME_SPEED;
@@ -84,12 +84,22 @@ export class Player {
         // Snake head collide with other snake's head or body
         if (otherPlayer) {
             if (collision.checkCollision(head, otherPlayer.snake.getHead())) {
-                // Everyone loses
-                clearInterval(this.updateInterval);
-                clearInterval(otherPlayer.updateInterval);
-                this.gameOver();
-                otherPlayer.gameOver();
-                game.running = false;
+                // If facing each other
+                if (this.snake.direction.diff(otherPlayer.snake.direction).equals(new Point(0, 0))) {
+                    // Everyone loses
+                    clearInterval(this.updateInterval);
+                    clearInterval(otherPlayer.updateInterval);
+                    this.gameOver();
+                    otherPlayer.gameOver();
+                    game.running = false;
+                } else {
+                    // I lose, I ran into them
+                    clearInterval(this.updateInterval);
+                    clearInterval(otherPlayer.updateInterval);
+                    this.gameOver();
+                    game.running = false;
+                    return;
+                }
             }
             if (collidedWithBody(head, otherPlayer.snake)) {
                 clearInterval(this.updateInterval);
@@ -119,19 +129,29 @@ export class Player {
         const wasEaten = game.foodSpawner.removeEatenFoods(head);
         if (wasEaten) {
             this.snake.addPart();
+            // for (let i = 0; i < this.snake.path.length; i++) {
+            //     let part = this.snake.path[i];
+            //     part.color = 'orange';
+            //     setTimeout(() => {
+            //         part.color = this.snake.color;
+            //     }, this.updateSpeed - 5);
+            // }
             // Increment if some were eaten
             this.updateScore();
             this.updateGameSpeed();
+            updateScoreText(this.num, this.score);
             clearInterval(this.updateInterval);
             this.updateInterval = setInterval(this.update, this.updateSpeed, game);
         }
 
-        // Spawn more
-        const ignore = [...this.snake.path];
-        if (otherPlayer) {
-            ignore.push(...otherPlayer.snake.path);            
+        if (game.foodSpawner.foods.length === 0) {
+            // Spawn more
+            const ignore = [...this.snake.path];
+            if (otherPlayer) {
+                ignore.push(...otherPlayer.snake.path);
+            }
+            game.foodSpawner.spawn(...ignore);
         }
-        game.foodSpawner.spawn(...ignore);
         this.unlockKeys();
     }
 

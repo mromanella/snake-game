@@ -30,8 +30,12 @@
     display: none;
 }
 
+.game-options div h3 {
+    text-decoration: underline;
+}
+
 .game-options div {
-    padding: 5px;
+    padding: 5px 0;
 }
 
 .option {

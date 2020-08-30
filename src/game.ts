@@ -1,12 +1,13 @@
 import { Player } from "./player";
 import { KeyboardController, getKeyboardController } from "./animator/src/keyboard/index";
-import { Animator } from "./animator/src/models";
+import { Animator, Point, Rectangle } from "./animator/src/models";
 import FoodSpawner from "./food/foodSpawner";
 
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS } from "./settings";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS } from "./constants";
 import { Snake } from "./snake/snake";
-import { setCanvasBorder, getScoreTag, initScoreTag, hideScoreTag } from "./utils";
+import { setCanvasBorder, getScoreTag, initScoreTag, hideScoreTag, updateScoreText } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
+import { SnakePart } from "./snake/snake-part";
 
 export interface Game {
     player1: Player,
@@ -24,6 +25,13 @@ export interface Options {
     collideWithWall: boolean
 }
 
+const gameBoard: Rectangle[] = [];
+for (let x = 0; x < CANVAS_WIDTH; x += SnakePart.partWidth) {
+    for (let y = 0; y < CANVAS_HEIGHT; y += SnakePart.partWidth) {
+        gameBoard.push(new Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f7f7f7'));
+    }  
+}
+
 /**
  * @description Drawing loop
  */
@@ -31,6 +39,9 @@ const drawLoop = (ctx: CanvasRenderingContext2D, animator: Animator, snakes: Sna
     foodSpawner.draw(ctx);
     for (let snake of snakes) {
         snake.draw(ctx, true);
+    }
+    for (let piece of gameBoard) {
+        piece.draw(ctx, false);
     }
 }
 
@@ -81,13 +92,11 @@ export const createGame = (options: Options): Game => {
 
 export const startGame = (game: Game) => {
     document.getElementById('play-area').classList.remove('hidden');
-    initScoreTag(1);
+    game.player1.updateInterval = setInterval(game.player1.update, game.player1.updateSpeed, game);
     if (game.options.numPlayers === 1) {
-        game.player1.updateInterval = setInterval(game.player1.update, game.player1.updateSpeed, game);
+        initScoreTag(1);
     } else {
-        game.player1.updateInterval = setInterval(game.player1.update, game.player1.updateSpeed, game);
         game.player2.updateInterval = setInterval(game.player2.update, game.player2.updateSpeed, game);
-        initScoreTag(2);
     }
     game.animator.resume();
     game.controller.listen();
@@ -96,11 +105,13 @@ export const startGame = (game: Game) => {
 
 export const stopGame = (game: Game) => {
     clearInterval(game.player1.updateInterval);
+    hideScoreTag(1);
+    updateScoreText(1, 0);
     if (game.options.numPlayers === 2) {
         clearInterval(game.player2.updateInterval);
+        hideScoreTag(2);
+        updateScoreText(2, 0);
     }
-    hideScoreTag(1);
-    hideScoreTag(2);
     game.animator.stop();
     game.controller.stopListening();
     game.running = false;
