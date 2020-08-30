@@ -2,22 +2,13 @@
     border: 1px black solid;
 }
 
-.solid {
-    border: inherit inherit solid;
-}
-
-.dashed {
+.game-window.dashed {
     border: 1px black dashed;
 }
 
 .centered {
-    display: flex;
-    justify-content: center;
-}
-
-.column {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    place-content: center;
 }
 
 .space-between {
@@ -26,7 +17,29 @@
 }
 
 .hidden {
-    visibility: hidden;
+    display: none;
+}
+
+.game-options {
+    /* height: 50vh; */
+    display: flex;
+    flex-direction: column;
+}
+
+.game-options.hidden {
+    display: none;
+}
+
+.game-options div {
+    padding: 5px;
+}
+
+.option {
+    margin-left: 5px;
+}
+
+.play-button {
+    height: 25px;
 }
 
 .github-footer {

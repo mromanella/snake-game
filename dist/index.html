@@ -10,8 +10,53 @@
     <title>Snake Game</title>
     <script async defer src="bundle.js"></script>
 </head>
-<body>
-    <div class="centered">
+<body class="centered">
+
+    <h1 class="main-title">Snake Game!</h1>
+
+    <section class="game-options">
+        <div>
+
+            <div >
+                <label for="numPlayers">Number of players: </label>
+                <select id="numPlayers" class="numPlayers option" name="numPlayers">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+            <div >
+                <label for="numFood">Number of food: </label>
+                <select id="numFood" class="numFood option" name="numFood">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
+            <div >
+                <label for="collideWithWall">Collide with wall: </label>
+                <select id="collideWithWall" class="collideWithWall option" name="collideWithWall">
+                    <option value="true">On</option>
+                    <option value="false">Off</option>
+                </select>
+            </div>
+
+        </div>
+        <div class="centered">
+            <button id="play-button" class="play-button">Play!</button>
+        </div>
+    </section>
+
+    <section id="play-area" class="hidden">
+        <div>
+            <button id="quit-button" class="play-button">Quit game</button>
+        </div>
         <div class="column">
             <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
             <div class="space-between">
@@ -19,7 +64,7 @@
                 <div id="player2-score" class="score-label hidden">Player 2: 0</div>
             </div>
         </div>
-    </div>
+    </section>
     <footer class="github-footer">
         <a href="https://github.com/mromanella/snake-game">Source code</a>
     </footer>

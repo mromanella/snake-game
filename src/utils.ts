@@ -48,7 +48,7 @@ export const collidedWithBody = (head: SnakePart, snake: Snake): boolean => {
 }
 
 const setCollideWithWallBorder = (animator: Animator) => {
-    animator.canvasEl.classList.add('solid');
+    animator.canvasEl.classList.remove('dashed');
 }
 
 const setPassThroughWallBorder = (animator: Animator) => {
@@ -74,4 +74,24 @@ export const goThroughWall = (snake: Snake) => {
         // RIGHT
         snake.getHead().x = 0;
     }
+}
+
+export const getScoreTag = (num: number) => {
+    let scoreTag = document.getElementById('player1-score');
+    if (num === 2) {
+        scoreTag = document.getElementById('player2-score');
+    }
+    return scoreTag;
+}
+
+export const initScoreTag = (num: number) => {
+    getScoreTag(num).classList.remove('hidden');
+}
+
+export const hideScoreTag = (num: number) => {
+    getScoreTag(num).classList.add('hidden');
+}
+
+export const updateScoreText = (num: number, score: number) => {
+    getScoreTag(num).innerText = `Player ${num}: ${score}`;
 }
