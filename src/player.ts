@@ -13,8 +13,8 @@ export class Player {
     keys: Key[];
     score: number = 0;
     alive: boolean = true;
-    updateSpeed: number = INITIAL_GAME_SPEED;
-    updateInterval: number = null;
+    speed: number = INITIAL_GAME_SPEED;
+    shouldUpdate: boolean = false;
 
     constructor(num: number, snake: Snake, keys: Key[]) {
         this.num = num;
@@ -23,7 +23,16 @@ export class Player {
         this.initKeys();
     }
 
-    initKeys = () => {
+    setUpdateTimeout() {
+        if (!this.alive) {
+            return;
+        }
+        setTimeout(() => {
+            this.shouldUpdate = true;
+        }, this.speed);
+    }
+
+    initKeys() {
         // Init the keys
         for (let key of this.keys) {
             key.addKeyPress((key: Key) => {
@@ -35,20 +44,21 @@ export class Player {
         }
     }
 
-    updateScore = () => {
+    updateScore() {
         this.score += 100;
     }
 
-    lockKeys = () => {
+    lockKeys() {
         lockKeys(this.keys);
     }
 
-    unlockKeys = () => {
+    unlockKeys() {
         unlockKeys(this.keys);
     }
 
-    gameOver = (useLastPath: boolean = false) => {
+    gameOver(useLastPath: boolean = false) {
         this.alive = false;
+        this.shouldUpdate = false;
         if (useLastPath) {
             this.snake.path = this.snake.lastPath;
         }
@@ -57,13 +67,32 @@ export class Player {
         }
     }
 
-    updateGameSpeed = () => {
-        if (this.updateSpeed > GAME_SPEED_LIMIT) {
-            this.updateSpeed -= GAME_SPEED_DELTA;
+    updateGameSpeed() {
+        if (this.speed > GAME_SPEED_LIMIT) {
+            this.speed -= GAME_SPEED_DELTA;
         }
     }
 
-    update = (game: Game) => {
+    grow() {
+        this.snake.addPart();
+        // for (let i = 0; i < this.snake.path.length; i++) {
+        //     let part = this.snake.path[i];
+        //     part.color = 'orange';
+        //     setTimeout(() => {
+        //         part.color = this.snake.color;
+        //     }, this.updateSpeed - 5);
+        // }
+        // Increment if some were eaten
+        this.updateScore();
+        this.updateGameSpeed();
+        updateScoreText(this.num, this.score);
+    }
+
+    update(game: Game) {
+        if (!this.shouldUpdate) {
+            return;
+        }
+        this.shouldUpdate = false;
         this.snake.update();
         const otherPlayer = this.otherPlayer(game);
         const head = this.snake.getHead();
@@ -71,13 +100,7 @@ export class Player {
 
         // Snake head colliding with body
         if (collidedWithBody(head, this.snake)) {
-            clearInterval(this.updateInterval);
-            if (otherPlayer) {
-                clearInterval(otherPlayer.updateInterval);
-            }
-
             this.gameOver();
-            game.running = false;
             return;
         }
 
@@ -87,25 +110,16 @@ export class Player {
                 // If facing each other
                 if (this.snake.direction.diff(otherPlayer.snake.direction).equals(new Point(0, 0))) {
                     // Everyone loses
-                    clearInterval(this.updateInterval);
-                    clearInterval(otherPlayer.updateInterval);
                     this.gameOver();
                     otherPlayer.gameOver();
-                    game.running = false;
                 } else {
                     // I lose, I ran into them
-                    clearInterval(this.updateInterval);
-                    clearInterval(otherPlayer.updateInterval);
                     this.gameOver();
-                    game.running = false;
                     return;
                 }
             }
             if (collidedWithBody(head, otherPlayer.snake)) {
-                clearInterval(this.updateInterval);
-                clearInterval(otherPlayer.updateInterval);
                 this.gameOver();
-                game.running = false;
                 return;
             }
         }
@@ -113,49 +127,18 @@ export class Player {
         // Snake head colliding with wall
         if (collidedWithWall(head)) {
             if (game.options.collideWithWall) {
-                clearInterval(this.updateInterval);
-                if (otherPlayer) {
-                    clearInterval(otherPlayer.updateInterval);
-                }
                 this.gameOver(true);
-                game.running = false;
                 return;
             }
-            // Otherwise 
+            // Otherwise
             goThroughWall(this.snake);
         }
 
-        // Remove eaten foods
-        const wasEaten = game.foodSpawner.removeEatenFoods(head);
-        if (wasEaten) {
-            this.snake.addPart();
-            // for (let i = 0; i < this.snake.path.length; i++) {
-            //     let part = this.snake.path[i];
-            //     part.color = 'orange';
-            //     setTimeout(() => {
-            //         part.color = this.snake.color;
-            //     }, this.updateSpeed - 5);
-            // }
-            // Increment if some were eaten
-            this.updateScore();
-            this.updateGameSpeed();
-            updateScoreText(this.num, this.score);
-            clearInterval(this.updateInterval);
-            this.updateInterval = setInterval(this.update, this.updateSpeed, game);
-        }
-
-        if (game.foodSpawner.foods.length === 0) {
-            // Spawn more
-            const ignore = [...this.snake.path];
-            if (otherPlayer) {
-                ignore.push(...otherPlayer.snake.path);
-            }
-            game.foodSpawner.spawn(...ignore);
-        }
         this.unlockKeys();
+        this.setUpdateTimeout();
     }
 
-    otherPlayer = (game: Game) => {
+    otherPlayer(game: Game) {
         if (this.num === 1) {
             return game.player2;
         }

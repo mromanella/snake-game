@@ -14,7 +14,7 @@ export class Snake {
         this.path.push(new SnakePart(x, y, this.color));
     }
 
-    setLastPath = () => {
+    setLastPath() {
         const lastPath = [];
         for (let snakePart of this.path) {
             lastPath.push(snakePart.copy());
@@ -22,15 +22,15 @@ export class Snake {
         this.lastPath = lastPath;
     }
 
-    getHead = () => {
+    getHead(): SnakePart {
         return this.path[0];
     }
 
-    getTail = () => {
+    getTail(): SnakePart {
         return this.path[this.path.length - 1];
     }
 
-    update = () => {
+    update() {
         // Preserve last path
         this.setLastPath()
 
@@ -43,13 +43,13 @@ export class Snake {
         this.path.unshift(tail);
     }
 
-    draw = (ctx: CanvasRenderingContext2D, fill: boolean = false, showBB: boolean = false) => {
+    draw(ctx: CanvasRenderingContext2D, fill: boolean = false, showBB: boolean = false) {
         for (let snakePart of this.path) {
             snakePart.draw(ctx, fill, showBB);
         }
     }
 
-    addPart = () => {
+    addPart() {
         if (this.path.length === 1) {
             // Add on the opposite direction where we are going
             let head = this.getHead();
@@ -62,11 +62,11 @@ export class Snake {
             let pt2 = this.getTail();
             let newPt = pt2.add(pt1.diff(pt2).direction().multiply(-SnakePart.partWidth));
             let part = new SnakePart(newPt.x, newPt.y, this.color);
-            this.path.push(part); 
+            this.path.push(part);
         }
     }
 
-    getBoundingBoxes = () => {
+    getBoundingBoxes() {
         const bb = [];
         for (let snakePart of this.path) {
             bb.push(snakePart.getBoundingBox());

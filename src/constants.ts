@@ -1,6 +1,3 @@
-import { Point } from "./animator/src/models"
-import { keyNames, Key } from "./animator/src/keyboard/index"
-
 const FPS = 30;
 const CANVAS_ID = 'game-window';
 const CANVAS_WIDTH = 400;

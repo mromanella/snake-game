@@ -1,11 +1,11 @@
 import { Player } from "./player";
 import { KeyboardController, getKeyboardController } from "./animator/src/keyboard/index";
-import { Animator, Point, Rectangle } from "./animator/src/models";
+import { Animator, Rectangle } from "./animator/src/models";
 import FoodSpawner from "./food/foodSpawner";
 
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT } from "./constants";
 import { Snake } from "./snake/snake";
-import { setCanvasBorder, getScoreTag, initScoreTag, hideScoreTag, updateScoreText } from "./utils";
+import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
 import { SnakePart } from "./snake/snake-part";
 
@@ -16,7 +16,8 @@ export interface Game {
     controller: KeyboardController,
     animator: Animator,
     options: Options,
-    running: boolean
+    running: boolean,
+    interval: number
 }
 
 export interface Options {
@@ -29,7 +30,42 @@ const gameBoard: Rectangle[] = [];
 for (let x = 0; x < CANVAS_WIDTH; x += SnakePart.partWidth) {
     for (let y = 0; y < CANVAS_HEIGHT; y += SnakePart.partWidth) {
         gameBoard.push(new Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f7f7f7'));
-    }  
+    }
+}
+
+function gameLoop(game: Game) {
+    if (!game.running) {
+        return;
+    }
+
+    const p1 = game.player1;
+    const foodSpawner = game.foodSpawner;
+    p1.update(game);
+    if (!p1.alive) {
+        game.running = false;
+        clearInterval(game.interval);
+    }
+    const p1Ate = foodSpawner.removeEatenFoods(p1.snake.getHead());
+    if (p1Ate) {
+        p1.grow();
+    }
+    const snakeParts = [...p1.snake.path];
+    if (game.options.numPlayers === 2) {
+        const p2 = game.player2;
+        p2.update(game);
+        if (!p2.alive) {
+            game.running = false;
+            clearInterval(game.interval);
+        }
+        const p2Ate = foodSpawner.removeEatenFoods(p2.snake.getHead());
+        if (p2Ate) {
+            p2.grow();
+        }
+        snakeParts.push(...p2.snake.path);
+    }
+    if (foodSpawner.foods.length === 0) {
+        foodSpawner.spawn(...snakeParts);
+    }
 }
 
 /**
@@ -53,7 +89,7 @@ const setupSingleplayer = (options: Options) => {
     const controller = getKeyboardController(player1Keys);
     const foodSpawner = new FoodSpawner(numFood, CANVAS_WIDTH, CANVAS_HEIGHT);
     foodSpawner.spawn(...player1Snake.path);
-    return { options, player1, controller, foodSpawner, running: false};
+    return { options, player1, controller, foodSpawner, running: false };
 }
 
 const setupMultiplayer = (options: Options) => {
@@ -76,10 +112,10 @@ export const createGame = (options: Options): Game => {
     const snakes: Snake[] = [];
 
     if (options.numPlayers === 1) {
-        game = {...setupSingleplayer(options), player2: null, animator: null};
+        game = { ...setupSingleplayer(options), player2: null, animator: null, interval: null };
         snakes.push(game.player1.snake);
     } else {
-        game = {...setupMultiplayer(options), animator: null};
+        game = { ...setupMultiplayer(options), animator: null, interval: null };
         snakes.push(game.player1.snake, game.player2.snake);
     }
 
@@ -92,26 +128,23 @@ export const createGame = (options: Options): Game => {
 
 export const startGame = (game: Game) => {
     document.getElementById('play-area').classList.remove('hidden');
-    game.player1.updateInterval = setInterval(game.player1.update, game.player1.updateSpeed, game);
     if (game.options.numPlayers === 1) {
+        game.player1.setUpdateTimeout();
         initScoreTag(1);
     } else {
-        game.player2.updateInterval = setInterval(game.player2.update, game.player2.updateSpeed, game);
+        game.player1.setUpdateTimeout();
+        game.player2.setUpdateTimeout();
     }
     game.animator.resume();
     game.controller.listen();
+    game.interval = setInterval(gameLoop, GAME_SPEED_LIMIT, game);
     game.running = true;
 }
 
 export const stopGame = (game: Game) => {
-    clearInterval(game.player1.updateInterval);
+    clearInterval(game.interval);
     hideScoreTag(1);
     updateScoreText(1, 0);
-    if (game.options.numPlayers === 2) {
-        clearInterval(game.player2.updateInterval);
-        hideScoreTag(2);
-        updateScoreText(2, 0);
-    }
     game.animator.stop();
     game.controller.stopListening();
     game.running = false;

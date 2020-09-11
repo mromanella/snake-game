@@ -1,5 +1,5 @@
 import { Rectangle } from "../animator/src/models";
-import { CANVAS_WIDTH, PART_WIDTH } from "../constants";
+import { PART_WIDTH } from "../constants";
 
 export class SnakePart extends Rectangle {
 
@@ -10,7 +10,7 @@ export class SnakePart extends Rectangle {
         super(x, y, SnakePart.partWidth, SnakePart.partWidth, color);
     }
 
-    copy = () => {
+    copy(): SnakePart {
         return new SnakePart(this.x, this.y, this.color);
     }
 }

@@ -1,17 +1,15 @@
-import { Snake } from "./snake/snake";
 import Key from "./animator/src/keyboard/key";
 import { Point } from "./animator/src/models";
-import { keyNames, lockKeys } from "./animator/src/keyboard/index";
-import { changeSnakeDirection } from "./utils";
+import { keyNames } from "./animator/src/keyboard/index";
 
 type _DIRECTIONS = {
     [key: string]: Point
 }
 
-export const UP = new Point(0, -1);
-export const DOWN = new Point(0, 1);
-export const LEFT = new Point(-1, 0);
-export const RIGHT = new Point(1, 0);
+const UP = new Point(0, -1);
+const DOWN = new Point(0, 1);
+const LEFT = new Point(-1, 0);
+const RIGHT = new Point(1, 0);
 
 const DIRECTIONS_MAP: _DIRECTIONS = {
     [keyNames.W]: UP,
@@ -24,11 +22,11 @@ const DIRECTIONS_MAP: _DIRECTIONS = {
     [keyNames.ARROW_RIGHT]: RIGHT
 }
 
-export const getDirectionForKey = (key: Key): Point => {
+function getDirectionForKey(key: Key): Point {
     return DIRECTIONS_MAP[key.keyName];
 }
 
-export const getPlayer1Keys = (): Key[] => {
+function getPlayer1Keys(): Key[] {
     const wKey = new Key(keyNames.W);
     const sKey = new Key(keyNames.S);
     const aKey = new Key(keyNames.A);
@@ -36,10 +34,20 @@ export const getPlayer1Keys = (): Key[] => {
     return [wKey, sKey, aKey, dKey];
 }
 
-export const getPlayer2Keys = (): Key[] => {
+function getPlayer2Keys(): Key[] {
     const upArrow = new Key(keyNames.ARROW_UP);
     const downArrow = new Key(keyNames.ARROW_DOWN);
     const leftArrow = new Key(keyNames.ARROW_LEFT);
     const rightArrow = new Key(keyNames.ARROW_RIGHT);
     return [upArrow, downArrow, leftArrow, rightArrow];
+}
+
+export {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    getDirectionForKey,
+    getPlayer1Keys,
+    getPlayer2Keys
 }
