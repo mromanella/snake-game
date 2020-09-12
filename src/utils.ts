@@ -6,7 +6,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
 import { collision } from "./animator/index";
 
-const validDirectionChange = (snake: Snake, newDirection: Point): boolean => {
+function validDirectionChange(snake: Snake, newDirection: Point): boolean {
     // Check to make sure that the new direction isn't 180 degrees in the opposite of 
     // our current heading
     // OR
@@ -20,7 +20,7 @@ const validDirectionChange = (snake: Snake, newDirection: Point): boolean => {
     return true;
 }
 
-export const changeSnakeDirection = (snake: Snake, key: Key): boolean => {
+function changeSnakeDirection(snake: Snake, key: Key): boolean {
     let wasValid = false;
     const direction = getDirectionForKey(key);
     if (validDirectionChange(snake, direction)) {
@@ -30,7 +30,7 @@ export const changeSnakeDirection = (snake: Snake, key: Key): boolean => {
     return wasValid;
 }
 
-export const collidedWithWall = (head: SnakePart): boolean => {
+function collidedWithWall(head: SnakePart): boolean {
     if (head.x < 0 || head.x >= CANVAS_WIDTH
         || head.y < 0 || head.y >= CANVAS_HEIGHT) {
         return true;
@@ -38,7 +38,7 @@ export const collidedWithWall = (head: SnakePart): boolean => {
     return false;
 }
 
-export const collidedWithBody = (head: SnakePart, snake: Snake): boolean => {
+function collidedWithBody(head: SnakePart, snake: Snake): boolean {
     for (let snakePart of snake.path.slice(1)) {
         if (collision.checkCollision(head, snakePart)) {
             return true;
@@ -47,15 +47,15 @@ export const collidedWithBody = (head: SnakePart, snake: Snake): boolean => {
     return false;
 }
 
-const setCollideWithWallBorder = (animator: Animator) => {
+function setCollideWithWallBorder(animator: Animator) {
     animator.canvasEl.classList.remove('dashed');
 }
 
-const setPassThroughWallBorder = (animator: Animator) => {
+function setPassThroughWallBorder(animator: Animator) {
     animator.canvasEl.classList.add('dashed');
 }
 
-export const setCanvasBorder = (options: any, animator: Animator) => {
+function setCanvasBorder(options: any, animator: Animator) {
     if (options.collideWithWall) {
         setCollideWithWallBorder(animator);
     } else {
@@ -63,7 +63,7 @@ export const setCanvasBorder = (options: any, animator: Animator) => {
     }
 }
 
-export const goThroughWall = (snake: Snake) => {         
+function goThroughWall(snake: Snake) {         
     if (snake.direction.equals(UP)) {
         snake.getHead().y = CANVAS_HEIGHT - SnakePart.partWidth;
     } else if (snake.direction.equals(DOWN)) {
@@ -76,7 +76,7 @@ export const goThroughWall = (snake: Snake) => {
     }
 }
 
-export const getScoreTag = (num: number) => {
+function getScoreTag(num: number) {
     let scoreTag = document.getElementById('player1-score');
     if (num === 2) {
         scoreTag = document.getElementById('player2-score');
@@ -84,17 +84,20 @@ export const getScoreTag = (num: number) => {
     return scoreTag;
 }
 
-export const initScoreTag = (num: number) => {
+function initScoreTag(num: number) {
     const scoreTag = getScoreTag(num);
     scoreTag.classList.remove('hidden');
 }
 
-export const hideScoreTag = (num: number) => {
+function hideScoreTag(num: number) {
     const scoreTag = getScoreTag(num);
     scoreTag.classList.add('hidden');
 }
 
-export const updateScoreText = (num: number, score: number) => {
+function updateScoreText(num: number, score: number) {
     const scoreTag = getScoreTag(num);
     scoreTag.innerText = `Player ${num}: ${score}`;
 }
+
+export { changeSnakeDirection, collidedWithBody, goThroughWall, collidedWithWall, updateScoreText,
+    setCanvasBorder, initScoreTag, hideScoreTag }
