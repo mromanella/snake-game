@@ -29,11 +29,15 @@ request.onerror = () => {
 request.onupgradeneeded = (event: any) => {
     db = event.target.result;
     objectStore = db.createObjectStore(HIGH_SCORES_DB_NAME, { keyPath: 'name' });
+    objectStore.transaction.oncomplete = () => {
+        addHighScore(0);
+        setHighScoreText(0);
+    }
 }
 
 function addHighScore(score: number) {
     const transaction = db.transaction(HIGH_SCORES_DB_NAME, 'readwrite').objectStore(HIGH_SCORES_DB_NAME);
-    transaction.put({ name: HIGH_SCORE_KEY, score: score })
+    transaction.put({ name: HIGH_SCORE_KEY, score: score });
 }
 
 function getHighScore(): IDBRequest {

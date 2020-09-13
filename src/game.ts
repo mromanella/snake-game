@@ -137,7 +137,7 @@ export const startGame = (game: Game) => {
     }
     game.animator.resume();
     game.controller.listen();
-    game.interval = setInterval(gameLoop, GAME_SPEED_LIMIT, game);
+    game.interval = setInterval(gameLoop, GAME_SPEED_LIMIT - 10, game);
     game.running = true;
 }
 
