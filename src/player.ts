@@ -1,7 +1,11 @@
 import { Snake } from "./snake/snake";
 import { Key, unlockKeys, lockKeys } from "./animator/src/keyboard/index";
 import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT } from "./constants";
-import { changeSnakeDirection, collidedWithBody, goThroughWall, collidedWithWall, updateScoreText } from "./utils";
+import {
+    changeSnakeDirection, collidedWithBody,
+    goThroughWall, collidedWithWall,
+    updateScoreText
+} from "./utils";
 import { Game } from "./game";
 import { collision } from "./animator/index";
 import { Point } from "./animator/src/models";
@@ -11,6 +15,7 @@ export class Player {
     num: number = 1;
     snake: Snake;
     keys: Key[];
+    keyPresses: Key[] = [];
     score: number = 0;
     alive: boolean = true;
     speed: number = INITIAL_GAME_SPEED;
@@ -36,24 +41,28 @@ export class Player {
         // Init the keys
         for (let key of this.keys) {
             key.addKeyPress((key: Key) => {
-                const valid = changeSnakeDirection(this.snake, key);
-                if (valid) {
-                    this.lockKeys();
+                const len = this.keyPresses.push(key);
+                if (len > 3) {
+                    // Remove from the front
+                    const remainder = len - 3;
+                    this.keyPresses.splice(0, remainder);
                 }
             })
         }
     }
 
+    spliceNextKeyPress() {
+        if (this.keyPresses.length > 0) {
+            const removed = this.keyPresses.splice(0, 1);
+            if (removed.length > 0) {
+                return removed[0];
+            }
+        }
+        return null;
+    }
+
     updateScore() {
         this.score += 100;
-    }
-
-    lockKeys() {
-        lockKeys(this.keys);
-    }
-
-    unlockKeys() {
-        unlockKeys(this.keys);
     }
 
     gameOver(useLastPath: boolean = false) {
@@ -93,6 +102,17 @@ export class Player {
             return;
         }
         this.shouldUpdate = false;
+
+        // Getting our next valid keypress and changing direction
+        let nextKey = this.spliceNextKeyPress();
+        let valid = changeSnakeDirection(this.snake, nextKey);
+        while (!valid && nextKey) {
+            if (!valid) {
+                nextKey = this.spliceNextKeyPress();
+                valid = changeSnakeDirection(this.snake, nextKey);
+            }
+        }
+
         this.snake.update();
         const otherPlayer = this.otherPlayer(game);
         const head = this.snake.getHead();
@@ -133,8 +153,6 @@ export class Player {
             // Otherwise
             goThroughWall(this.snake);
         }
-
-        this.unlockKeys();
         this.setUpdateTimeout();
     }
 

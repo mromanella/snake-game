@@ -12,82 +12,115 @@
 </head>
 
 <body>
-    <main style="margin: 0 10%" class="centered">
-        <h1 class="main-title centered" style="margin-bottom: 0;">Snake Game!</h1>
-        <section class="description">
-            <ul>
-                <li>The first valid direction key pressed by a player will be used, so make it count!</li>
-                <li>The snakes grow and their speed increases as they eat food.</li>
-                <li>2 player games end when one player causes the other to collide with the wall or snake body.
-                    The points don't matter!
-                </li>
-            </ul>
-        </section>
+    <div class="top-container">
 
-        <section class="game-options">
-            <div class="centered">
-                <div class="top-score space-around">
-                    <label for="top-score-value">Top Score: </label>
-                    <span id="top-score-value" class="top-score-value">0</span>
-                </div>
-                <h3>Game Options</h3>
-                <div title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. 
-                The second player is the blue snake and uses the arrow keys to move.">
-                    <label for="numPlayers">Number of players: </label>
-                    <select id="numPlayers" class="numPlayers option" name="numPlayers">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                    </select>
-                </div>
-
-                <div title="Sets the number of food which is on the board at a time. More food will spawn
-                once all food has been cleared.">
-                    <label for="numFood">Number of food: </label>
-                    <select id="numFood" class="numFood option" name="numFood">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                    </select>
-                </div>
-                <div title="Sets the collide with wall option. If this is off then the snake will go into the
-                 wall and come out of the opposite wall instead of losing.">
-                    <label for="collideWithWall">Collide with wall: </label>
-                    <select id="collideWithWall" class="collideWithWall option" name="collideWithWall">
-                        <option value="true">On</option>
-                        <option value="false">Off</option>
-                    </select>
-                </div>
-
-                <div class="centered">
-                    <button id="play-button" class="play-button">Play!</button>
-                </div>
+        <header>
+            <h1 class="main-title">Snake Game!</h1>
+            <div class="top-score space-around">
+                <h3 for="top-score-value">Top Score: <span id="top-score-value" class="top-score-value">0</span></h3>
             </div>
-        </section>
+        </header>
 
-        <section id="play-area" class="hidden centered">
-            <div>
-                <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
-                <div class="space-between">
-                    <div id="player1-score" class="score-label hidden">Player 1: 0</div>
-                    <div id="player2-score" class="score-label hidden">Player 2: 0</div>
-                </div>
-            </div>
-            <div class="centered">
-                <button id="quit-button" class="play-button">Quit game</button>
-            </div>
-        </section>
+        <main>
+            <div class="content">
+                <button id="go-back-button" class="back-button button hidden top-0"
+                    style="left: 0;font-weight: bold">Back<span><span></span></span></button>
+                <section id="main-menu" class="button-container top-0">
+                    <button id="play-button" class="button play-button">Play!<span><span></span></span></button>
+                    <button id="options-button" class="button">Options<span><span></span></span></button>
+                    <button id="info-button" class="button">Info<span><span></span></span></button>
+                </section>
 
-    </main>
-    <footer class="github-footer">
-        <a href="https://github.com/mromanella/snake-game">Source code</a>
-    </footer>
+                <section id="options" class="options slid-out top-0">
+                    <div class="content">
+                        <h2>Options</h2>
+                        <div>
+                            <div title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. 
+                            The second player is the blue snake and uses the arrow keys to move.">
+                                <label for="numPlayers">Number of players: </label>
+                                <select id="numPlayers" class="numPlayers option" name="numPlayers">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </div>
+
+                            <div title="Sets the number of food which is on the board at a time. More food will spawn
+                            once all food has been cleared.">
+                                <label for="numFood">Number of food: </label>
+                                <select id="numFood" class="numFood option" name="numFood">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
+                            <div title="Sets the collide with wall option. If this is off then the snake will go into the
+                             wall and come out of the opposite wall instead of losing.">
+                                <label for="collideWithWall">Collide with wall: </label>
+                                <select id="collideWithWall" class="collideWithWall option" name="collideWithWall">
+                                    <option value="true">On</option>
+                                    <option value="false">Off</option>
+                                </select>
+                            </div>
+                            <div title="Whether to display a grid or not.">
+                                <label for="displayGrid">Display grid: </label>
+                                <select id="displayGrid" class="displayGrid option" name="displayGrid">
+                                    <option value="true">On</option>
+                                    <option value="false">Off</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="info" class="info slid-out top-0">
+                    <div class="content">
+                        <h2>Info</h2>
+                        <ul>
+                            <li>The snakes grow and their speed increases as they eat food.</li>
+                            <li>
+                                2 player games end when one player causes the other to collide with the wall or snake
+                                body.
+                                The points don't matter!
+                            </li>
+                            <li>In a 2 player game the first player is the black snake and uses W,S,A,D to move.
+                                The second player is the blue snake and uses the arrow keys to move.
+                            </li>
+                            <li>
+                                More food will spawn once all food has been cleared.
+                            </li>
+                            <li>
+                                You can play with walls on or off. When the wall is off the
+                                snake will go into the wall and come out of the opposite wall instead of losing.
+                            </li>
+                            <li>
+                                You can turn the grid off to make the game easier
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="play-area" class="slid-out top-0">
+                    <div class="content">
+                        <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
+                        <div class="space-between">
+                            <div id="player1-score" class="score-label hidden">Player 1: 0</div>
+                            <div id="player2-score" class="score-label hidden">Player 2: 0</div>
+                            <button id="quit-button" class="back-button button top-0"
+                                style="left: 0;font-weight: bold">Quit
+                                game<span><span></span></span></button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
     <script src="bundle.js"></script>
 </body>
 

@@ -5,7 +5,7 @@ import FoodSpawner from "./food/foodSpawner";
 
 import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT } from "./constants";
 import { Snake } from "./snake/snake";
-import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText } from "./utils";
+import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, hideElement, showElement } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
 import { SnakePart } from "./snake/snake-part";
 
@@ -17,25 +17,28 @@ export interface Game {
     animator: Animator,
     options: Options,
     running: boolean,
-    interval: number
+    interval: number,
+    onFinish: Function
 }
 
 export interface Options {
     numPlayers: number,
     numFood: number,
-    collideWithWall: boolean
+    collideWithWall: boolean,
+    displayGrid: boolean
 }
 
-const gameBoard: Rectangle[] = [];
+const grid: Rectangle[] = [];
 for (let x = 0; x < CANVAS_WIDTH; x += SnakePart.partWidth) {
     for (let y = 0; y < CANVAS_HEIGHT; y += SnakePart.partWidth) {
-        gameBoard.push(new Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f7f7f7'));
+        grid.push(new Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f7f7f7'));
     }
 }
 
 function gameLoop(game: Game) {
     if (!game.running) {
-        return;
+        clearInterval(game.interval);
+        return game.onFinish();
     }
 
     const p1 = game.player1;
@@ -43,7 +46,6 @@ function gameLoop(game: Game) {
     p1.update(game);
     if (!p1.alive) {
         game.running = false;
-        clearInterval(game.interval);
     }
     const p1Ate = foodSpawner.removeEatenFoods(p1.snake.getHead());
     if (p1Ate) {
@@ -55,7 +57,6 @@ function gameLoop(game: Game) {
         p2.update(game);
         if (!p2.alive) {
             game.running = false;
-            clearInterval(game.interval);
         }
         const p2Ate = foodSpawner.removeEatenFoods(p2.snake.getHead());
         if (p2Ate) {
@@ -71,17 +72,19 @@ function gameLoop(game: Game) {
 /**
  * @description Drawing loop
  */
-const drawLoop = (ctx: CanvasRenderingContext2D, animator: Animator, snakes: Snake[], foodSpawner: FoodSpawner) => {
+function drawLoop(ctx: CanvasRenderingContext2D, animator: Animator, snakes: Snake[], foodSpawner: FoodSpawner, options: Options) {
+    if (options.displayGrid) {
+        for (let piece of grid) {
+            piece.draw(ctx, false);
+        }
+    }
     foodSpawner.draw(ctx);
     for (let snake of snakes) {
         snake.draw(ctx, true);
     }
-    for (let piece of gameBoard) {
-        piece.draw(ctx, false);
-    }
 }
 
-const setupSingleplayer = (options: Options) => {
+function setupSingleplayer(options: Options) {
     const numFood = options.numFood;
     const player1Keys = getPlayer1Keys();
     const player1Snake = new Snake(200, 200);
@@ -92,7 +95,7 @@ const setupSingleplayer = (options: Options) => {
     return { options, player1, controller, foodSpawner, running: false };
 }
 
-const setupMultiplayer = (options: Options) => {
+function setupMultiplayer(options: Options) {
     const numFood = options.numFood;
     const foodSpawner = new FoodSpawner(numFood, CANVAS_WIDTH, CANVAS_HEIGHT);
     const player1Keys = getPlayer1Keys();
@@ -106,28 +109,26 @@ const setupMultiplayer = (options: Options) => {
     return { options, player1, player2: player2, controller, foodSpawner, running: false };
 }
 
-export const createGame = (options: Options): Game => {
+export function createGame(options: Options): Game {
 
     let game: Game = null;
     const snakes: Snake[] = [];
 
     if (options.numPlayers === 1) {
-        game = { ...setupSingleplayer(options), player2: null, animator: null, interval: null };
+        game = { ...setupSingleplayer(options), player2: null, animator: null, interval: null, onFinish: () => {} };
         snakes.push(game.player1.snake);
     } else {
-        game = { ...setupMultiplayer(options), animator: null, interval: null };
+        game = { ...setupMultiplayer(options), animator: null, interval: null, onFinish: () => {} };
         snakes.push(game.player1.snake, game.player2.snake);
     }
 
-    const animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snakes, game.foodSpawner);
-    game.animator = animator;
-    setCanvasBorder(options, animator);
+    game.animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snakes, game.foodSpawner, options);
+    setCanvasBorder(options, game.animator);
 
     return game;
 }
 
-export const startGame = (game: Game) => {
-    document.getElementById('play-area').classList.remove('hidden');
+export function startGame(game: Game) {
     if (game.options.numPlayers === 1) {
         game.player1.setUpdateTimeout();
         initScoreTag(1);
@@ -141,12 +142,11 @@ export const startGame = (game: Game) => {
     game.running = true;
 }
 
-export const stopGame = (game: Game) => {
+export function stopGame(game: Game) {
     clearInterval(game.interval);
     hideScoreTag(1);
     updateScoreText(1, 0);
     game.animator.stop();
     game.controller.stopListening();
     game.running = false;
-    document.getElementById('play-area').classList.add('hidden');
 }

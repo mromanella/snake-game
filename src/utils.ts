@@ -21,6 +21,9 @@ function validDirectionChange(snake: Snake, newDirection: Point): boolean {
 }
 
 function changeSnakeDirection(snake: Snake, key: Key): boolean {
+    if (!key) {
+        return false;
+    }
     let wasValid = false;
     const direction = getDirectionForKey(key);
     if (validDirectionChange(snake, direction)) {
@@ -86,12 +89,12 @@ function getScoreTag(num: number) {
 
 function initScoreTag(num: number) {
     const scoreTag = getScoreTag(num);
-    scoreTag.classList.remove('hidden');
+    showElement(scoreTag);
 }
 
 function hideScoreTag(num: number) {
     const scoreTag = getScoreTag(num);
-    scoreTag.classList.add('hidden');
+    hideElement(scoreTag);
 }
 
 function updateScoreText(num: number, score: number) {
@@ -99,5 +102,41 @@ function updateScoreText(num: number, score: number) {
     scoreTag.innerText = `Player ${num}: ${score}`;
 }
 
-export { changeSnakeDirection, collidedWithBody, goThroughWall, collidedWithWall, updateScoreText,
-    setCanvasBorder, initScoreTag, hideScoreTag }
+function hideElement(element: HTMLElement) {
+    element.classList.add('hidden');
+}
+
+function showElement(element: HTMLElement) {
+    element.classList.remove('hidden');
+}
+
+function slideIn(element: HTMLElement) {
+    element.classList.remove('slide-in');
+    element.classList.remove('slide-out');
+    element.classList.remove('slid-out');
+    element.classList.add('slide-in'); 
+    setTimeout(() => {
+        element.classList.add('slid-in');
+        element.classList.remove('slide-in'); 
+    }, 1000);
+}
+
+function slideOut(element: HTMLElement) {
+    element.classList.remove('slide-out');
+    element.classList.remove('slide-in');
+    element.classList.remove('slid-in');
+    element.classList.add('slide-out');
+    setTimeout(() => {
+        element.classList.add('slid-out');
+        element.classList.remove('slide-out');
+    }, 1000);
+}
+
+function fadeOut(element: HTMLElement) {
+    element.classList.add('fade-out');
+    return 750;
+}
+
+export { validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall, 
+    collidedWithWall, updateScoreText,
+    setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn, slideOut, fadeOut }

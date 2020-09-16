@@ -1,9 +1,9 @@
 import { Options, createGame, startGame, stopGame } from "./game";
 
 import "./index.css";
+import { hideElement, showElement, slideIn, slideOut } from "./utils";
 
-// Display the settings
-
+// Set up db
 let db: IDBDatabase;
 let objectStore: IDBObjectStore;
 const HIGH_SCORES_DB_NAME = 'high_scores';
@@ -24,7 +24,7 @@ request.onsuccess = (event: any) => {
     }
 }
 request.onerror = () => {
-    console.log('Need access to database to work.');
+    alert('Need access to database to work.');
 }
 request.onupgradeneeded = (event: any) => {
     db = event.target.result;
@@ -45,21 +45,61 @@ function getHighScore(): IDBRequest {
     return transaction.get(HIGH_SCORE_KEY);
 }
 
+
+function setHighScoreText(score: number) {
+    topScoreValueEl.textContent = `${score}`;
+}
+
+// Get ref to all menu items
+const topScoreValueEl: HTMLElement = document.querySelector('#top-score-value');
+const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
+
+const gameOptionsEl: HTMLElement = document.querySelector('#options');
+const numPlayersEl: HTMLSelectElement = document.querySelector('#numPlayers');
+const numFoodEl: HTMLSelectElement = document.querySelector('#numFood');
+const collideWithWallEl: HTMLSelectElement = document.querySelector('#collideWithWall');
+const displayGridEl: HTMLSelectElement = document.querySelector('#displayGrid');
+
+const rulesEl: HTMLSelectElement = document.querySelector('#info');
+
+const playAreaEl: HTMLSelectElement = document.querySelector('#play-area');
+
+const goBackButtonEl: HTMLSelectElement = document.querySelector('#go-back-button');
+
+let currentScreen = mainMenuEl;
+
+function transitionScreen(from: HTMLElement, to: HTMLElement) {
+    slideOut(from);
+    slideIn(to);
+    currentScreen = to;
+}
+
+goBackButtonEl.addEventListener('click', () => {
+    transitionScreen(currentScreen, mainMenuEl);
+    hideElement(goBackButtonEl);
+});
+
+document.getElementById('options-button').addEventListener('click', (event: MouseEvent) => {
+    transitionScreen(mainMenuEl, gameOptionsEl);
+    setTimeout(showElement, 1000, goBackButtonEl);
+})
+
+document.getElementById('info-button').addEventListener('click', (event: MouseEvent) => {
+    transitionScreen(mainMenuEl, rulesEl);
+    setTimeout(showElement, 1000, goBackButtonEl);
+})
+
+// Game starts here
 document.getElementById('play-button').addEventListener('click', (event: MouseEvent) => {
-    const numPlayersEl: HTMLSelectElement = document.querySelector('#numPlayers');
-    const numFoodEl: HTMLSelectElement = document.querySelector('#numFood');
-    const collideWithWallEl: HTMLSelectElement = document.querySelector('#collideWithWall');
     const options: Options = {
         numPlayers: Number(numPlayersEl.value),
         numFood: Number(numFoodEl.value),
-        collideWithWall: collideWithWallEl.value === 'true' ? true : false
+        collideWithWall: collideWithWallEl.value === 'true' ? true : false,
+        displayGrid: displayGridEl.value === 'true' ? true : false
     }
-    document.querySelector('.game-options').classList.add('hidden');
-    const game = createGame(options);
-    startGame(game);
 
-    document.querySelector('#quit-button').addEventListener('click', () => {
-        stopGame(game);
+    const game = createGame(options);
+    game.onFinish = () => {
         if (game.options.numPlayers === 1) {
             getHighScore().onsuccess = (event: any) => {
                 const highScore = event.target.result['score'];
@@ -70,10 +110,12 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
                 }
             }
         }
-        document.querySelector('.game-options').classList.remove('hidden');
+    }
+    transitionScreen(mainMenuEl, playAreaEl);
+    startGame(game);
+    document.querySelector('#quit-button').addEventListener('click', () => {
+        game.onFinish();
+        stopGame(game);
+        transitionScreen(playAreaEl, mainMenuEl);
     });
 })
-
-function setHighScoreText(score: number) {
-    document.querySelector('#top-score-value').textContent = `${score}`;
-}
