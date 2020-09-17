@@ -20,6 +20,7 @@ export class Player {
     alive: boolean = true;
     speed: number = INITIAL_GAME_SPEED;
     shouldUpdate: boolean = false;
+    onMaxSpeed = () => {}
 
     constructor(num: number, snake: Snake, keys: Key[]) {
         this.num = num;
@@ -79,6 +80,9 @@ export class Player {
     updateGameSpeed() {
         if (this.speed > GAME_SPEED_LIMIT) {
             this.speed -= GAME_SPEED_DELTA;
+            if (this.speed === GAME_SPEED_LIMIT) {
+                this.onMaxSpeed();
+            }
         }
     }
 

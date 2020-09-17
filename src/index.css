@@ -14,6 +14,17 @@ header {
     align-items: center;
 }
 
+.notification {
+    background-color: tomato;
+    font-size: 1.5em;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    position: relative;
+    left: -15px;
+}
+
 header .top-score .top-score-value {
     padding: 0;
     padding-left: 10px;
@@ -197,8 +208,4 @@ section h2 {
 .space-between {
     display: flex;
     justify-content: space-between;
-}
-
-.github-footer {
-
 }

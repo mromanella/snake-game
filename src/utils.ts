@@ -137,6 +137,16 @@ function fadeOut(element: HTMLElement) {
     return 750;
 }
 
+function showNotification(text: string, time: number = 7500) {
+    const notificationEl = document.getElementById('notification');
+    notificationEl.innerText = text;
+    slideIn(notificationEl);
+    setTimeout(() => {
+        slideOut(notificationEl);
+    }, time);
+}
+
 export { validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall, 
     collidedWithWall, updateScoreText,
-    setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn, slideOut, fadeOut }
+    setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn, 
+    slideOut, fadeOut, showNotification }

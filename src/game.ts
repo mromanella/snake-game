@@ -3,9 +3,9 @@ import { KeyboardController, getKeyboardController } from "./animator/src/keyboa
 import { Animator, Rectangle } from "./animator/src/models";
 import FoodSpawner from "./food/foodSpawner";
 
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT, GAME_SPEED_DELTA } from "./constants";
 import { Snake } from "./snake/snake";
-import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, hideElement, showElement } from "./utils";
+import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, hideElement, showElement, showNotification } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
 import { SnakePart } from "./snake/snake-part";
 
@@ -117,9 +117,18 @@ export function createGame(options: Options): Game {
     if (options.numPlayers === 1) {
         game = { ...setupSingleplayer(options), player2: null, animator: null, interval: null, onFinish: () => {} };
         snakes.push(game.player1.snake);
+        game.player1.onMaxSpeed = () => {
+            showNotification('Player has hit max speed!');
+        }
     } else {
         game = { ...setupMultiplayer(options), animator: null, interval: null, onFinish: () => {} };
         snakes.push(game.player1.snake, game.player2.snake);
+        game.player1.onMaxSpeed = () => {
+            showNotification('Player 1 has hit max speed!');
+        }
+        game.player2.onMaxSpeed = () => {
+            showNotification('Player 2 has hit max speed!');
+        }
     }
 
     game.animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snakes, game.foodSpawner, options);

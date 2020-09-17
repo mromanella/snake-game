@@ -1,6 +1,5 @@
-import { Options, createGame, startGame, stopGame } from "./game";
-
 import "./index.css";
+import { Options, createGame, startGame, stopGame } from "./game";
 import { hideElement, showElement, slideIn, slideOut } from "./utils";
 
 // Set up db
