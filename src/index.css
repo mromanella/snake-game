@@ -2,10 +2,6 @@
     font-family: 'Luckiest Guy', sans-serif;
 }
 
-body {
-    overflow: hidden;
-}
-
 .top-container {
     margin: 0 10%;
     display: flex;
