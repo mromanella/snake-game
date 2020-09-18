@@ -114,7 +114,7 @@ section h2 {
     align-self: center;
     /* height: 50px; */
     width: max-content;
-    /* color: white; */
+    color: black;
     font-size: 1.5em;
     /* background-color: rgb(206, 85, 85); */
     background-color: transparent;
@@ -157,8 +157,16 @@ section h2 {
     z-index: 2;
 }
 
-.score-label {
-    font-size: 1.25em;
+.score-area {
+    display: flex;
+    height: 6vh;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.score-area div {
+    font-size: 1.5em;
 }
 
 .paused-section {

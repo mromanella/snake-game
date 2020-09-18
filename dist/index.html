@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
     <title>Snake Game</title>
 </head>
 
@@ -39,7 +39,8 @@
                     <div class="content">
                         <h2>Options</h2>
                         <div>
-                            <div title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. The second player is the blue snake and uses the arrow keys to move.">
+                            <div
+                                title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. The second player is the blue snake and uses the arrow keys to move.">
                                 <label for="numPlayers">Number of players: </label>
                                 <select id="numPlayers" class="numPlayers option" name="numPlayers">
                                     <option value="1">1</option>
@@ -47,7 +48,8 @@
                                 </select>
                             </div>
 
-                            <div title="Sets the number of food which is on the board at a time. More food will spawn once all food has been cleared.">
+                            <div
+                                title="Sets the number of food which is on the board at a time. More food will spawn once all food has been cleared.">
                                 <label for="numFood">Number of food: </label>
                                 <select id="numFood" class="numFood option" name="numFood">
                                     <option value="1">1</option>
@@ -62,7 +64,8 @@
                                     <option value="10">10</option>
                                 </select>
                             </div>
-                            <div title="Sets the collide with wall option. If this is off then the snake will go into the wall and come out of the opposite wall instead of losing.">
+                            <div
+                                title="Sets the collide with wall option. If this is off then the snake will go into the wall and come out of the opposite wall instead of losing.">
                                 <label for="collideWithWall">Collide with wall: </label>
                                 <select id="collideWithWall" class="collideWithWall option" name="collideWithWall">
                                     <option value="true">On</option>
@@ -108,22 +111,22 @@
                 </section>
 
                 <section id="play-area" class="slid-out top-0">
+                    <button id="quit-button" class="back-button button top-0" style="left: 0;font-weight: bold">Quit
+                        game<span><span></span></span></button>
                     <div class="content">
                         <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
-                        <div class="space-between">
-                            <div id="player1-score" class="score-label hidden">Player 1: 0</div>
-                            <div id="player2-score" class="score-label hidden">Player 2: 0</div>
-                            <button id="quit-button" class="back-button button top-0"
-                                style="left: 0;font-weight: bold">Quit
-                                game<span><span></span></span></button>
+                        <div class="score-area">
+                            <div>Press P to pause</div>
+                            <div id="player1-score" class="hidden">Player 1: 0</div>
+                            <div id="player2-score" class="hidden">Player 2: 0</div>
                         </div>
-                        <div style="font-size: 1.5em;">Press P to pause</div>
                     </div>
                 </section>
             </div>
         </main>
         <footer>
-            <a style="font-family: 'Courier New', Courier, monospace;font-weight: bold;font-size: 1.15em;" href="https://github.com/mromanella/snake-game">Source</a>
+            <a style="font-family: 'Courier New', Courier, monospace;font-weight: bold;font-size: 1.15em;"
+                href="https://github.com/mromanella/snake-game">Source</a>
         </footer>
     </div>
     <script src="bundle.js"></script>
