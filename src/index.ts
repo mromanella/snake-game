@@ -1,6 +1,7 @@
 import "./index.css";
-import { Options, createGame, startGame, stopGame } from "./game";
-import { hideElement, showElement, slideIn, slideOut } from "./utils";
+import { Options, createGame, startGame, stopGame, Game, pauseGame, resumeGame } from "./game";
+import { hideElement, showElement, showNotification, slideIn, slideOut } from "./utils";
+import { getKeyboardController, Key, keyNames } from "./animator/src/keyboard/index";
 
 // Set up db
 let db: IDBDatabase;
@@ -65,6 +66,8 @@ const playAreaEl: HTMLSelectElement = document.querySelector('#play-area');
 
 const goBackButtonEl: HTMLSelectElement = document.querySelector('#go-back-button');
 
+const pausedSectionEl:  HTMLSelectElement = document.querySelector('#paused-section');
+
 let currentScreen = mainMenuEl;
 
 function transitionScreen(from: HTMLElement, to: HTMLElement) {
@@ -88,6 +91,16 @@ document.getElementById('info-button').addEventListener('click', (event: MouseEv
     setTimeout(showElement, 1000, goBackButtonEl);
 })
 
+function togglePause(game: Game) {
+    if (game.running) {
+        pauseGame(game);
+        showElement(pausedSectionEl);
+    } else {
+        hideElement(pausedSectionEl);
+        resumeGame(game);
+    }
+}
+
 // Game starts here
 document.getElementById('play-button').addEventListener('click', (event: MouseEvent) => {
     const options: Options = {
@@ -98,7 +111,7 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
     }
 
     const game = createGame(options);
-    game.onFinish = () => {
+    game.onFinish.add(() => {
         if (game.options.numPlayers === 1) {
             getHighScore().onsuccess = (event: any) => {
                 const highScore = event.target.result['score'];
@@ -106,14 +119,18 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
                 if (score > highScore) {
                     addHighScore(score);
                     setHighScoreText(score);
+                    showNotification('New top score!');
                 }
             }
         }
-    }
+    });
+    const kbController = getKeyboardController();
+    kbController.addKey(new Key(keyNames.P, [() => {
+        togglePause(game);
+    }]))
     transitionScreen(mainMenuEl, playAreaEl);
     startGame(game);
     document.querySelector('#quit-button').addEventListener('click', () => {
-        game.onFinish();
         stopGame(game);
         transitionScreen(playAreaEl, mainMenuEl);
     });

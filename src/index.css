@@ -1,5 +1,9 @@
 * {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Luckiest Guy', sans-serif;
+}
+
+body {
+    overflow: hidden;
 }
 
 .top-container {
@@ -23,6 +27,7 @@ header {
     font-weight: bold;
     position: relative;
     left: -15px;
+    /* z-index: 1; */
 }
 
 header .top-score .top-score-value {
@@ -30,7 +35,7 @@ header .top-score .top-score-value {
     padding-left: 10px;
 }
 
-main > div.content {
+main>div.content {
     overflow: hidden;
     position: relative;
     height: 100vh;
@@ -52,13 +57,15 @@ main > div.content {
 }
 
 .hidden {
-    display: none!important;
+    display: none !important;
 }
 
 .options {
     /* height: 50vh; */
     display: flex;
     flex-direction: column;
+    font-size: 1.25em;
+    margin: 10px;
 }
 
 .options.hidden {
@@ -69,7 +76,7 @@ section {
     width: 100%;
 }
 
-section > div.content {
+section>div.content {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -85,7 +92,18 @@ section h2 {
 }
 
 .option {
-    margin-left: 5px;
+    margin: 10px;
+}
+
+.info {
+    margin: 10px;
+}
+
+.info ul li {
+    padding: 10px;
+    font-size: 1.25;
+    font-weight: 700;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .button-container {
@@ -109,7 +127,7 @@ section h2 {
     padding: 10px;
 }
 
-.button > span {
+.button>span {
     display: flex;
     bottom: 0;
     height: 100%;
@@ -117,14 +135,18 @@ section h2 {
 }
 
 
-.button > span > span {
+.button>span>span {
     width: 0;
     height: 2px;
     transform: translateY(5px);
     background-color: rgb(206, 85, 85);
 }
 
-.button:hover > span > span {
+.button:hover {
+    color: rgb(206, 85, 85);
+}
+
+.button:hover>span>span {
     animation: border-bottom-fill-anim 250ms linear forwards;
 }
 
@@ -135,19 +157,42 @@ section h2 {
 
 
 .button.back-button {
+    z-index: 2;
+}
+
+.score-label {
+    font-size: 1.25em;
+}
+
+.paused-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
     z-index: 1;
+    background-color: black;
+}
+
+.paused-text {
+    font-size: 10em;
+    color: white;
 }
 
 .slide-out {
-    animation: slide-out-anim 1000ms linear forwards;
+    animation: slide-out-anim 750ms linear forwards;
 }
 
 .slid-out {
-    transform: translateY(-1000px);
+    transform: translateY(-500%);
 }
 
 .slide-in {
-    animation: slide-in-anim 1000ms linear forwards;
+    animation: slide-in-anim 750ms linear forwards;
 }
 
 .slid-in {
@@ -162,6 +207,7 @@ section h2 {
     from {
         width: 0;
     }
+
     to {
         width: 100%;
     }
@@ -169,8 +215,9 @@ section h2 {
 
 @keyframes slide-in-anim {
     from {
-        transform: translateY(-1000px);
+        transform: translateY(-500%);
     }
+
     to {
         transform: translateY(0);
     }
@@ -180,8 +227,9 @@ section h2 {
     from {
         transform: translateY(0);
     }
+
     to {
-        transform: translateY(-1000px);
+        transform: translateY(-500%);
     }
 }
 
@@ -190,6 +238,7 @@ section h2 {
         opacity: 1;
         display: initial;
     }
+
     to {
         opacity: 0;
         display: none;
@@ -200,6 +249,7 @@ section h2 {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }

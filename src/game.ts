@@ -1,5 +1,5 @@
 import { Player } from "./player";
-import { KeyboardController, getKeyboardController } from "./animator/src/keyboard/index";
+import { KeyboardController, getKeyboardController, lockKeys, unlockKeys } from "./animator/src/keyboard/index";
 import { Animator, Rectangle } from "./animator/src/models";
 import FoodSpawner from "./food/foodSpawner";
 
@@ -8,6 +8,7 @@ import { Snake } from "./snake/snake";
 import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, hideElement, showElement, showNotification } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
 import { SnakePart } from "./snake/snake-part";
+import GameEvent from "./animator/src/events";
 
 export interface Game {
     player1: Player,
@@ -18,7 +19,7 @@ export interface Game {
     options: Options,
     running: boolean,
     interval: number,
-    onFinish: Function
+    onFinish: GameEvent;
 }
 
 export interface Options {
@@ -37,16 +38,12 @@ for (let x = 0; x < CANVAS_WIDTH; x += SnakePart.partWidth) {
 
 function gameLoop(game: Game) {
     if (!game.running) {
-        clearInterval(game.interval);
-        return game.onFinish();
+        return;
     }
 
     const p1 = game.player1;
     const foodSpawner = game.foodSpawner;
     p1.update(game);
-    if (!p1.alive) {
-        game.running = false;
-    }
     const p1Ate = foodSpawner.removeEatenFoods(p1.snake.getHead());
     if (p1Ate) {
         p1.grow();
@@ -55,9 +52,6 @@ function gameLoop(game: Game) {
     if (game.options.numPlayers === 2) {
         const p2 = game.player2;
         p2.update(game);
-        if (!p2.alive) {
-            game.running = false;
-        }
         const p2Ate = foodSpawner.removeEatenFoods(p2.snake.getHead());
         if (p2Ate) {
             p2.grow();
@@ -115,22 +109,25 @@ export function createGame(options: Options): Game {
     const snakes: Snake[] = [];
 
     if (options.numPlayers === 1) {
-        game = { ...setupSingleplayer(options), player2: null, animator: null, interval: null, onFinish: () => {} };
+        game = { ...setupSingleplayer(options), player2: null, animator: null, interval: null, onFinish: null };
         snakes.push(game.player1.snake);
-        game.player1.onMaxSpeed = () => {
+        game.player1.onMaxSpeed.add(() => {
             showNotification('Player has hit max speed!');
-        }
+        });
+        game.player1.onGameOver.add(() => {
+            game.onFinish.trigger();
+        })
     } else {
-        game = { ...setupMultiplayer(options), animator: null, interval: null, onFinish: () => {} };
+        game = { ...setupMultiplayer(options), animator: null, interval: null, onFinish: null };
         snakes.push(game.player1.snake, game.player2.snake);
-        game.player1.onMaxSpeed = () => {
+        game.player1.onMaxSpeed.add(() => {
             showNotification('Player 1 has hit max speed!');
-        }
-        game.player2.onMaxSpeed = () => {
+        });
+        game.player2.onMaxSpeed.add(() => {
             showNotification('Player 2 has hit max speed!');
-        }
+        });
     }
-
+    game.onFinish = new GameEvent(game);
     game.animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snakes, game.foodSpawner, options);
     setCanvasBorder(options, game.animator);
 
@@ -152,10 +149,39 @@ export function startGame(game: Game) {
 }
 
 export function stopGame(game: Game) {
+    game.running = false;
     clearInterval(game.interval);
     hideScoreTag(1);
     updateScoreText(1, 0);
     game.animator.stop();
     game.controller.stopListening();
+}
+
+export function resumeGame(game: Game) {
+    game.animator.resume();
+    if (game.options.numPlayers === 1) {
+        game.player1.shouldUpdate = true;
+        unlockKeys(game.player1.keys);
+    }
+    else {
+        unlockKeys(game.player1.keys);
+        unlockKeys(game.player2.keys);
+        game.player1.shouldUpdate = true;
+        game.player2.shouldUpdate = true;
+    }
+    game.running = true;
+}
+
+export function pauseGame(game: Game) {
     game.running = false;
+    game.animator.pause();
+    if (game.options.numPlayers === 1) {
+        lockKeys(game.player1.keys);
+        game.player1.shouldUpdate = false;
+    } else {
+        lockKeys(game.player1.keys);
+        lockKeys(game.player2.keys);
+        game.player1.shouldUpdate = false;
+        game.player2.shouldUpdate = false;
+    }
 }

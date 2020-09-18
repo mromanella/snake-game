@@ -7,13 +7,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://use.fontawesome.com/591eaa7791.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet"> 
     <title>Snake Game</title>
 </head>
 
 <body>
     <div class="top-container">
-
+        <section id="paused-section" class="paused-section hidden">
+            <h1 id="paused-text" class="paused-text">PAUSED</h1>
+            <div style="font-size: 1.5em;color: white;" class="paused-text">Press P to unpause</div>
+        </section>
         <header>
             <h1 class="main-title">Snake Game!</h1>
             <div id="notification" class="slid-out notification"></div>
@@ -36,8 +39,7 @@
                     <div class="content">
                         <h2>Options</h2>
                         <div>
-                            <div title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. 
-                            The second player is the blue snake and uses the arrow keys to move.">
+                            <div title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. The second player is the blue snake and uses the arrow keys to move.">
                                 <label for="numPlayers">Number of players: </label>
                                 <select id="numPlayers" class="numPlayers option" name="numPlayers">
                                     <option value="1">1</option>
@@ -45,8 +47,7 @@
                                 </select>
                             </div>
 
-                            <div title="Sets the number of food which is on the board at a time. More food will spawn
-                            once all food has been cleared.">
+                            <div title="Sets the number of food which is on the board at a time. More food will spawn once all food has been cleared.">
                                 <label for="numFood">Number of food: </label>
                                 <select id="numFood" class="numFood option" name="numFood">
                                     <option value="1">1</option>
@@ -61,8 +62,7 @@
                                     <option value="10">10</option>
                                 </select>
                             </div>
-                            <div title="Sets the collide with wall option. If this is off then the snake will go into the
-                             wall and come out of the opposite wall instead of losing.">
+                            <div title="Sets the collide with wall option. If this is off then the snake will go into the wall and come out of the opposite wall instead of losing.">
                                 <label for="collideWithWall">Collide with wall: </label>
                                 <select id="collideWithWall" class="collideWithWall option" name="collideWithWall">
                                     <option value="true">On</option>
@@ -117,6 +117,7 @@
                                 style="left: 0;font-weight: bold">Quit
                                 game<span><span></span></span></button>
                         </div>
+                        <div style="font-size: 1.15em;">Press P to pause</div>
                     </div>
                 </section>
             </div>

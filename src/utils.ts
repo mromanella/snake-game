@@ -66,7 +66,7 @@ function setCanvasBorder(options: any, animator: Animator) {
     }
 }
 
-function goThroughWall(snake: Snake) {         
+function goThroughWall(snake: Snake) {
     if (snake.direction.equals(UP)) {
         snake.getHead().y = CANVAS_HEIGHT - SnakePart.partWidth;
     } else if (snake.direction.equals(DOWN)) {
@@ -114,10 +114,10 @@ function slideIn(element: HTMLElement) {
     element.classList.remove('slide-in');
     element.classList.remove('slide-out');
     element.classList.remove('slid-out');
-    element.classList.add('slide-in'); 
+    element.classList.add('slide-in');
     setTimeout(() => {
         element.classList.add('slid-in');
-        element.classList.remove('slide-in'); 
+        element.classList.remove('slide-in');
     }, 1000);
 }
 
@@ -132,12 +132,21 @@ function slideOut(element: HTMLElement) {
     }, 1000);
 }
 
-function fadeOut(element: HTMLElement) {
-    element.classList.add('fade-out');
-    return 750;
+function applySlidIn(element: HTMLElement) {
+    element.classList.remove('slid-out');
+    element.classList.add('slid-in');
 }
 
-function showNotification(text: string, time: number = 7500) {
+function applySlidOut(element: HTMLElement) {
+    element.classList.remove('slid-in');
+    element.classList.add('slid-out');
+}
+
+function fadeOut(element: HTMLElement) {
+    element.classList.add('fade-out');
+}
+
+function showNotification(text: string, time: number = 5000) {
     const notificationEl = document.getElementById('notification');
     notificationEl.innerText = text;
     slideIn(notificationEl);
@@ -146,7 +155,10 @@ function showNotification(text: string, time: number = 7500) {
     }, time);
 }
 
-export { validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall, 
+export {
+    validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall,
     collidedWithWall, updateScoreText,
-    setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn, 
-    slideOut, fadeOut, showNotification }
+    setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn,
+    slideOut, fadeOut, showNotification,
+    applySlidIn, applySlidOut
+}

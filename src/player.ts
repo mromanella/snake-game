@@ -9,6 +9,7 @@ import {
 import { Game } from "./game";
 import { collision } from "./animator/index";
 import { Point } from "./animator/src/models";
+import GameEvent from "./animator/src/events";
 
 export class Player {
 
@@ -20,7 +21,8 @@ export class Player {
     alive: boolean = true;
     speed: number = INITIAL_GAME_SPEED;
     shouldUpdate: boolean = false;
-    onMaxSpeed = () => {}
+    onMaxSpeed = new GameEvent(this);
+    onGameOver = new GameEvent(this);
 
     constructor(num: number, snake: Snake, keys: Key[]) {
         this.num = num;
@@ -75,13 +77,14 @@ export class Player {
         for (let snakePart of this.snake.path) {
             snakePart.color = 'red';
         }
+        this.onGameOver.trigger();
     }
 
     updateGameSpeed() {
         if (this.speed > GAME_SPEED_LIMIT) {
             this.speed -= GAME_SPEED_DELTA;
             if (this.speed === GAME_SPEED_LIMIT) {
-                this.onMaxSpeed();
+                this.onMaxSpeed.trigger();
             }
         }
     }
