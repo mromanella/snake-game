@@ -1,4 +1,4 @@
 Add options
 * Refactor
-* Singleplayer
-* Multiplayer - Add in checking for hitting other snake
+* Fix snake on snake game over logic
+* Add in some audio

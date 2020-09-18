@@ -117,7 +117,7 @@ section h2 {
     /* color: white; */
     font-size: 1.5em;
     /* background-color: rgb(206, 85, 85); */
-    background-color: white;
+    background-color: transparent;
     border: none;
     border-radius: 3px;
     cursor: pointer;

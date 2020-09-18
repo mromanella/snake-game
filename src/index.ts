@@ -111,6 +111,11 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
     }
 
     const game = createGame(options);
+    const kbController = getKeyboardController();
+    const pKey = new Key(keyNames.P, [() => {
+        togglePause(game);
+    }]);
+    kbController.addKey(pKey)
     game.onFinish.add(() => {
         if (game.options.numPlayers === 1) {
             getHighScore().onsuccess = (event: any) => {
@@ -123,11 +128,8 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
                 }
             }
         }
+        pKey.setLocked(true);
     });
-    const kbController = getKeyboardController();
-    kbController.addKey(new Key(keyNames.P, [() => {
-        togglePause(game);
-    }]))
     transitionScreen(mainMenuEl, playAreaEl);
     startGame(game);
     document.querySelector('#quit-button').addEventListener('click', () => {

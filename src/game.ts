@@ -123,9 +123,17 @@ export function createGame(options: Options): Game {
         game.player1.onMaxSpeed.add(() => {
             showNotification('Player 1 has hit max speed!');
         });
+        game.player1.onGameOver.add(() => {
+            game.running = false;
+            game.onFinish.trigger();
+        })
         game.player2.onMaxSpeed.add(() => {
             showNotification('Player 2 has hit max speed!');
         });
+        game.player2.onGameOver.add(() => {
+            game.running = false;
+            game.onFinish.trigger();
+        })
     }
     game.onFinish = new GameEvent(game);
     game.animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snakes, game.foodSpawner, options);
