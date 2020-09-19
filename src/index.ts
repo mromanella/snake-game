@@ -2,6 +2,7 @@ import "./index.css";
 import { Options, createGame, startGame, stopGame, Game, pauseGame, resumeGame } from "./game";
 import { hideElement, showElement, showNotification, slideIn, slideOut } from "./utils";
 import { getKeyboardController, Key, keyNames } from "./animator/src/keyboard/index";
+import { register } from "./animator/src/events";
 
 // Set up db
 let db: IDBDatabase;
@@ -65,7 +66,7 @@ const playAreaEl: HTMLSelectElement = document.querySelector('#play-area');
 
 const goBackButtonEl: HTMLSelectElement = document.querySelector('#go-back-button');
 
-const pausedSectionEl:  HTMLSelectElement = document.querySelector('#paused-section');
+const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-section');
 
 let currentScreen = mainMenuEl;
 
@@ -100,6 +101,21 @@ function togglePause(game: Game) {
     }
 }
 
+function onFinish(game: Game, pKey: Key) {
+    if (game.options.numPlayers === 1) {
+        getHighScore().onsuccess = (event: any) => {
+            const highScore = event.target.result['score'];
+            const score = game.player1.score;
+            if (score > highScore) {
+                addHighScore(score);
+                setHighScoreText(score);
+                showNotification('New top score!');
+            }
+        }
+    }
+    pKey.setLocked(true);
+}
+
 function run(options: Options) {
     const game = createGame(options);
     const kbController = getKeyboardController();
@@ -107,20 +123,7 @@ function run(options: Options) {
         togglePause(game);
     }]);
     kbController.addKey(pKey)
-    game.onFinish.add(() => {
-        if (game.options.numPlayers === 1) {
-            getHighScore().onsuccess = (event: any) => {
-                const highScore = event.target.result['score'];
-                const score = game.player1.score;
-                if (score > highScore) {
-                    addHighScore(score);
-                    setHighScoreText(score);
-                    showNotification('New top score!');
-                }
-            }
-        }
-        pKey.setLocked(true);
-    });
+    register('onFinish', onFinish, game, pKey);
     transitionScreen(mainMenuEl, playAreaEl);
     startGame(game);
     document.querySelector('#quit-button').addEventListener('click', () => {

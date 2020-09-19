@@ -2,9 +2,10 @@ import { Snake } from "./snake/snake";
 import { Point, Animator } from "./animator/src/models";
 import Key from "./animator/src/keyboard/key";
 import { getDirectionForKey, UP, DOWN, RIGHT, LEFT } from "./controls";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_SPEED_LIMIT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
 import { collision } from "./animator/index";
+import { Game } from "./game";
 
 function validDirectionChange(snake: Snake, newDirection: Point): boolean {
     // Check to make sure that the new direction isn't 180 degrees in the opposite of 
@@ -155,10 +156,22 @@ function showNotification(text: string, time: number = 5000) {
     }, time);
 }
 
+function onMaxSpeed(game: Game) {
+    if (game.options.numPlayers === 1) {
+        showNotification('Player has hit max speed!');
+    } else {
+        if (game.player1.speed === GAME_SPEED_LIMIT) {
+            showNotification('Player 1 has hit max speed!');
+        } else {
+            showNotification('Player 2 has hit max speed!');
+        }
+    }
+}
+
 export {
     validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall,
     collidedWithWall, updateScoreText,
     setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn,
     slideOut, fadeOut, showNotification,
-    applySlidIn, applySlidOut
+    applySlidIn, applySlidOut, onMaxSpeed
 }
