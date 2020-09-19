@@ -1,7 +1,7 @@
 import { Snake } from "./snake/snake";
 import { Point, Animator } from "./animator/src/models";
 import Key from "./animator/src/keyboard/key";
-import { getDirectionForKey, UP, DOWN, RIGHT, LEFT } from "./controls";
+import { getDirectionForKey, UP, DOWN, LEFT } from "./controls";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_SPEED_LIMIT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
 import { collision } from "./animator/index";

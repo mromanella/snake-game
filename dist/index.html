@@ -43,6 +43,18 @@
                         <h2>Options</h2>
                         <div>
                             <div
+                            title="How fast the snakes move. Snakes will get faster as they eat in progressive mode.">
+                            <label for="snakeSpeed">Snake speed: </label>
+                            <select id="snakeSpeed" class="snakeSpeed option" name="snakeSpeed">
+                                <option value="0">Progressive</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                            <div
                                 title="Sets the number of food which is on the board at a time. More food will spawn once all food has been cleared.">
                                 <label for="numFood">Number of food: </label>
                                 <select id="numFood" class="numFood option" name="numFood">
@@ -81,7 +93,7 @@
                     <div class="content">
                         <h2>Info</h2>
                         <ul>
-                            <li>The snakes grow and their speed increases as they eat food.</li>
+                            <li>The snakes grow and their speed increases as they eat food in progressive speed mode.</li>
                             <li>
                                 2 player games end when one player causes the other to collide with the wall or snake
                                 body.

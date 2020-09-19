@@ -3,9 +3,9 @@ import { KeyboardController, getKeyboardController, lockKeys, unlockKeys } from 
 import { Animator, Rectangle } from "./animator/src/models";
 import FoodSpawner from "./food/foodSpawner";
 
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT, GAME_SPEED_DELTA } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT, PLAYER_DEATH_EVENT, GAME_FINISH_EVENT, PLAYER_MAX_SPEED_EVENT, GAME_SPEEDS } from "./constants";
 import { Snake } from "./snake/snake";
-import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, hideElement, showElement, showNotification, onMaxSpeed } from "./utils";
+import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, onMaxSpeed } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
 import { SnakePart } from "./snake/snake-part";
 import { register, trigger } from "./animator/src/events";
@@ -25,7 +25,8 @@ export interface Options {
     numPlayers: number,
     numFood: number,
     collideWithWall: boolean,
-    displayGrid: boolean
+    displayGrid: boolean,
+    snakeSpeed: number
 }
 
 const grid: Rectangle[] = [];
@@ -79,9 +80,10 @@ function drawLoop(ctx: CanvasRenderingContext2D, animator: Animator, snakes: Sna
 
 function setupSingleplayer(options: Options) {
     const numFood = options.numFood;
+    const gameSpeed = GAME_SPEEDS[options.snakeSpeed];
     const player1Keys = getPlayer1Keys();
     const player1Snake = new Snake(200, 200);
-    const player1 = new Player(1, player1Snake, player1Keys);
+    const player1 = new Player(1, gameSpeed, player1Snake, player1Keys);
     const controller = getKeyboardController(player1Keys);
     const foodSpawner = new FoodSpawner(numFood, CANVAS_WIDTH, CANVAS_HEIGHT);
     foodSpawner.spawn(...player1Snake.path);
@@ -90,14 +92,15 @@ function setupSingleplayer(options: Options) {
 
 function setupMultiplayer(options: Options) {
     const numFood = options.numFood;
+    const gameSpeed = GAME_SPEEDS[options.snakeSpeed];
     const foodSpawner = new FoodSpawner(numFood, CANVAS_WIDTH, CANVAS_HEIGHT);
     const player1Keys = getPlayer1Keys();
     const player2Keys = getPlayer2Keys();
     const controller = getKeyboardController([...player1Keys, ...player2Keys]);
     const player1Snake = new Snake(200, 150);
     const player2Snake = new Snake(200, 250, 'blue');
-    const player1 = new Player(1, player1Snake, player1Keys);
-    const player2 = new Player(2, player2Snake, player2Keys);
+    const player1 = new Player(1, gameSpeed, player1Snake, player1Keys);
+    const player2 = new Player(2, gameSpeed, player2Snake, player2Keys);
     foodSpawner.spawn(...player1Snake.path, ...player2Snake.path);
     return { options, player1, player2: player2, controller, foodSpawner, running: false };
 }
@@ -114,8 +117,8 @@ export function createGame(options: Options): Game {
         game = { ...setupMultiplayer(options), animator: null, interval: null };
         snakes.push(game.player1.snake, game.player2.snake);
     }
-    register('onMaxSpeed', onMaxSpeed, game);
-    register('onGameOver', trigger, 'onFinish');
+    register(PLAYER_MAX_SPEED_EVENT, onMaxSpeed, game);
+    register(PLAYER_DEATH_EVENT, trigger, GAME_FINISH_EVENT);
     game.animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snakes, game.foodSpawner, options);
     setCanvasBorder(options, game.animator);
     return game;

@@ -1,6 +1,6 @@
 import { Snake } from "./snake/snake";
 import { Key, unlockKeys, lockKeys } from "./animator/src/keyboard/index";
-import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT } from "./constants";
+import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT, PLAYER_MAX_SPEED_EVENT, PLAYER_DEATH_EVENT } from "./constants";
 import {
     changeSnakeDirection, collidedWithBody,
     goThroughWall, collidedWithWall,
@@ -18,11 +18,18 @@ export class Player {
     keyPresses: Key[] = [];
     score: number = 0;
     alive: boolean = true;
-    speed: number = INITIAL_GAME_SPEED;
+    initialSpeed: number;
+    speed: number;
     shouldUpdate: boolean = false;
 
-    constructor(num: number, snake: Snake, keys: Key[]) {
+    constructor(num: number, initialSpeed: number, snake: Snake, keys: Key[]) {
         this.num = num;
+        this.initialSpeed = initialSpeed;
+        if (initialSpeed === -1) {
+            this.speed = INITIAL_GAME_SPEED;
+        } else {
+            this.speed = initialSpeed;
+        }
         this.snake = snake;
         this.keys = keys;
         this.initKeys();
@@ -74,14 +81,14 @@ export class Player {
         for (let snakePart of this.snake.path) {
             snakePart.color = 'red';
         }
-        events.trigger('onGameOver');
+        events.trigger(PLAYER_DEATH_EVENT);
     }
 
     updateGameSpeed() {
         if (this.speed > GAME_SPEED_LIMIT) {
             this.speed -= GAME_SPEED_DELTA;
             if (this.speed === GAME_SPEED_LIMIT) {
-                events.trigger('onMaxSpeed');
+                events.trigger(PLAYER_MAX_SPEED_EVENT);
             }
         }
     }
@@ -97,7 +104,9 @@ export class Player {
         // }
         // Increment if some were eaten
         this.updateScore();
-        this.updateGameSpeed();
+        if (this.initialSpeed === -1) {
+            this.updateGameSpeed();
+        }
         updateScoreText(this.num, this.score);
     }
 

@@ -3,6 +3,7 @@ import { Options, createGame, startGame, stopGame, Game, pauseGame, resumeGame }
 import { hideElement, showElement, showNotification, slideIn, slideOut } from "./utils";
 import { getKeyboardController, Key, keyNames } from "./animator/src/keyboard/index";
 import { register } from "./animator/src/events";
+import { GAME_FINISH_EVENT } from "./constants";
 
 // Set up db
 let db: IDBDatabase;
@@ -56,6 +57,7 @@ const topScoreValueEl: HTMLElement = document.querySelector('#top-score-value');
 const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
 
 const gameOptionsEl: HTMLElement = document.querySelector('#options');
+const snakeSpeedEl: HTMLSelectElement = document.querySelector('#snakeSpeed');
 const numFoodEl: HTMLSelectElement = document.querySelector('#numFood');
 const collideWithWallEl: HTMLSelectElement = document.querySelector('#collideWithWall');
 const displayGridEl: HTMLSelectElement = document.querySelector('#displayGrid');
@@ -123,7 +125,7 @@ function run(options: Options) {
         togglePause(game);
     }]);
     kbController.addKey(pKey)
-    register('onFinish', onFinish, game, pKey);
+    register(GAME_FINISH_EVENT, onFinish, game, pKey);
     transitionScreen(mainMenuEl, playAreaEl);
     startGame(game);
     document.querySelector('#quit-button').addEventListener('click', () => {
@@ -138,7 +140,8 @@ document.getElementById('singleplayer-button').addEventListener('click', (event:
         numPlayers: 1,
         numFood: Number(numFoodEl.value),
         collideWithWall: collideWithWallEl.value === 'true' ? true : false,
-        displayGrid: displayGridEl.value === 'true' ? true : false
+        displayGrid: displayGridEl.value === 'true' ? true : false,
+        snakeSpeed: Number(snakeSpeedEl.value)
     }
     run(options);
 })
@@ -148,7 +151,8 @@ document.getElementById('multiplayer-button').addEventListener('click', (event: 
         numPlayers: 2,
         numFood: Number(numFoodEl.value),
         collideWithWall: collideWithWallEl.value === 'true' ? true : false,
-        displayGrid: displayGridEl.value === 'true' ? true : false
+        displayGrid: displayGridEl.value === 'true' ? true : false,
+        snakeSpeed: Number(snakeSpeedEl.value)
     }
     run(options);
 })
