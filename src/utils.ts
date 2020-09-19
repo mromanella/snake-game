@@ -118,7 +118,7 @@ function slideIn(element: HTMLElement) {
     setTimeout(() => {
         element.classList.add('slid-in');
         element.classList.remove('slide-in');
-    }, 1000);
+    }, 800);
 }
 
 function slideOut(element: HTMLElement) {
@@ -129,7 +129,7 @@ function slideOut(element: HTMLElement) {
     setTimeout(() => {
         element.classList.add('slid-out');
         element.classList.remove('slide-out');
-    }, 1000);
+    }, 800);
 }
 
 function applySlidIn(element: HTMLElement) {

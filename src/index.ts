@@ -55,7 +55,6 @@ const topScoreValueEl: HTMLElement = document.querySelector('#top-score-value');
 const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
 
 const gameOptionsEl: HTMLElement = document.querySelector('#options');
-const numPlayersEl: HTMLSelectElement = document.querySelector('#numPlayers');
 const numFoodEl: HTMLSelectElement = document.querySelector('#numFood');
 const collideWithWallEl: HTMLSelectElement = document.querySelector('#collideWithWall');
 const displayGridEl: HTMLSelectElement = document.querySelector('#displayGrid');
@@ -83,12 +82,12 @@ goBackButtonEl.addEventListener('click', () => {
 
 document.getElementById('options-button').addEventListener('click', (event: MouseEvent) => {
     transitionScreen(mainMenuEl, gameOptionsEl);
-    setTimeout(showElement, 1000, goBackButtonEl);
+    setTimeout(showElement, 800, goBackButtonEl);
 })
 
 document.getElementById('info-button').addEventListener('click', (event: MouseEvent) => {
     transitionScreen(mainMenuEl, rulesEl);
-    setTimeout(showElement, 1000, goBackButtonEl);
+    setTimeout(showElement, 800, goBackButtonEl);
 })
 
 function togglePause(game: Game) {
@@ -101,15 +100,7 @@ function togglePause(game: Game) {
     }
 }
 
-// Game starts here
-document.getElementById('play-button').addEventListener('click', (event: MouseEvent) => {
-    const options: Options = {
-        numPlayers: Number(numPlayersEl.value),
-        numFood: Number(numFoodEl.value),
-        collideWithWall: collideWithWallEl.value === 'true' ? true : false,
-        displayGrid: displayGridEl.value === 'true' ? true : false
-    }
-
+function run(options: Options) {
     const game = createGame(options);
     const kbController = getKeyboardController();
     const pKey = new Key(keyNames.P, [() => {
@@ -136,4 +127,25 @@ document.getElementById('play-button').addEventListener('click', (event: MouseEv
         stopGame(game);
         transitionScreen(playAreaEl, mainMenuEl);
     });
+}
+
+// Game starts here
+document.getElementById('singleplayer-button').addEventListener('click', (event: MouseEvent) => {
+    const options: Options = {
+        numPlayers: 1,
+        numFood: Number(numFoodEl.value),
+        collideWithWall: collideWithWallEl.value === 'true' ? true : false,
+        displayGrid: displayGridEl.value === 'true' ? true : false
+    }
+    run(options);
+})
+
+document.getElementById('multiplayer-button').addEventListener('click', (event: MouseEvent) => {
+    const options: Options = {
+        numPlayers: 2,
+        numFood: Number(numFoodEl.value),
+        collideWithWall: collideWithWallEl.value === 'true' ? true : false,
+        displayGrid: displayGridEl.value === 'true' ? true : false
+    }
+    run(options);
 })

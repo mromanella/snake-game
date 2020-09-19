@@ -148,8 +148,8 @@ section h2 {
 }
 
 
-.button.play-button {
-    font-size: 7em;
+.button.singleplayer-button, .button.multiplayer-button {
+    font-size: 3em;
 }
 
 
