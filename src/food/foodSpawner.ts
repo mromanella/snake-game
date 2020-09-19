@@ -1,8 +1,9 @@
 import { Food } from './food';
-import { GameObject } from '../animator/src/models';
+import { Circle, GameObject } from '../animator/src/models';
 import { collision } from '../animator/index';
 import { SnakePart } from '../snake/snake-part';
 import { randomBetween } from '../animator/src/utils';
+import { FOOD_OFFSET } from '../constants';
 
 export default class FoodSpawner {
 
@@ -26,11 +27,10 @@ export default class FoodSpawner {
         let newFoodY = randomBetween(0, yMax);
         // This calculation is to make sure the food in placed on a place that is divisible by 10 and
         // also offset by 5 which makes the box and food line up right.
-        food.x = newFoodX - (newFoodX % 10) + 5;
-        food.y = newFoodY - (newFoodY % 10) + 5;
+        food.x = newFoodX - (newFoodX % 10) + FOOD_OFFSET;
+        food.y = newFoodY - (newFoodY % 10) + FOOD_OFFSET;
         return food;
     }
-
 
     spawn(...notOn: GameObject[]) {
         if (this.foods.length === this.numMax) {
@@ -40,8 +40,10 @@ export default class FoodSpawner {
             notOn = [...notOn, ...this.foods]
             let ok = false;
             let food = this.randomizeFood(this.xMax, this.yMax);
+            // Can't forget about offset
+            let c = new Circle(food.x - FOOD_OFFSET, food.y - FOOD_OFFSET, food.radius, 'white');
             for (let gameObj of notOn) {
-                if (!collision.checkCollision(food, gameObj)) {
+                if (!collision.checkCollision(c, gameObj)) {
                     ok = true;
                     break;
                 }

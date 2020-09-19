@@ -43,6 +43,18 @@
                         <h2>Options</h2>
                         <div>
                             <div
+<<<<<<< HEAD
+=======
+                                title="Sets the number of players. First player is the black snake and uses W,S,A,D to move. The second player is the blue snake and uses the arrow keys to move.">
+                                <label for="numPlayers">Number of players: </label>
+                                <select id="numPlayers" class="numPlayers option" name="numPlayers">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </div>
+
+                            <div
+>>>>>>> 56128f32d5a98472b74ff196507535e27d0ff259
                                 title="Sets the number of food which is on the board at a time. More food will spawn once all food has been cleared.">
                                 <label for="numFood">Number of food: </label>
                                 <select id="numFood" class="numFood option" name="numFood">
@@ -105,16 +117,15 @@
                 </section>
 
                 <section id="play-area" class="slid-out top-0">
+                    <button id="quit-button" class="back-button button top-0" style="left: 0;font-weight: bold">Quit
+                        game<span><span></span></span></button>
                     <div class="content">
                         <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
-                        <div class="space-between">
-                            <div id="player1-score" class="score-label hidden">Player 1: 0</div>
-                            <div id="player2-score" class="score-label hidden">Player 2: 0</div>
-                            <button id="quit-button" class="back-button button top-0"
-                                style="left: 0;font-weight: bold">Quit
-                                game<span><span></span></span></button>
+                        <div class="score-area">
+                            <div>Press P to pause</div>
+                            <div id="player1-score" class="hidden">Player 1: 0</div>
+                            <div id="player2-score" class="hidden">Player 2: 0</div>
                         </div>
-                        <div style="font-size: 1.5em;">Press P to pause</div>
                     </div>
                 </section>
             </div>
