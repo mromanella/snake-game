@@ -118,7 +118,10 @@ export function createGame(options: Options): Game {
         snakes.push(game.player1.snake, game.player2.snake);
     }
     register(PLAYER_MAX_SPEED_EVENT, onMaxSpeed, game);
-    register(PLAYER_DEATH_EVENT, trigger, GAME_FINISH_EVENT);
+    register(PLAYER_DEATH_EVENT, () => {
+        game.running = false;
+        trigger(GAME_FINISH_EVENT);
+    });
     game.animator = new Animator(CANVAS_ID, FPS, drawLoop, true, snakes, game.foodSpawner, options);
     setCanvasBorder(options, game.animator);
     return game;
