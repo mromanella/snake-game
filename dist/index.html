@@ -43,15 +43,14 @@
                         <h2>Options</h2>
                         <div>
                             <div
-                            title="How fast the snakes move. Snakes will get faster as they eat in progressive mode.">
-                            <label for="snakeSpeed">Snake speed: </label>
-                            <select id="snakeSpeed" class="snakeSpeed option" name="snakeSpeed">
-                                <option value="0">Progressive</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
+                            title="How fast the snakes move from the beginning. Snakes will get faster as they eat.">
+                            <label for="startingSpeed">Starting speed: </label>
+                            <select id="startingSpeed" class="startingSpeed option" name="startingSpeed">
+                                <option value="0">1</option>
+                                <option value="1">2</option>
+                                <option value="2">3</option>
+                                <option value="3">4</option>
+                                <option value="4">5</option>
                             </select>
                         </div>
                             <div
@@ -86,6 +85,7 @@
                                 </select>
                             </div>
                         </div>
+                        <button id="play-button" class="button play-button">Play<span><span></span></span></button>
                     </div>
                 </section>
 
@@ -93,7 +93,7 @@
                     <div class="content">
                         <h2>Info</h2>
                         <ul>
-                            <li>The snakes grow and their speed increases as they eat food in progressive speed mode.</li>
+                            <li>The snakes grow and their speed increases as they eat food.</li>
                             <li>
                                 2 player games end when one player causes the other to collide with the wall or snake
                                 body.

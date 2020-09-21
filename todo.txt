@@ -2,3 +2,4 @@ Add options
 * Refactor
 * Fix snake on snake game over logic
 * Add in some audio
+* Shrink the play field

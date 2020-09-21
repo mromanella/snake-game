@@ -5,7 +5,7 @@ import { getDirectionForKey, UP, DOWN, LEFT } from "./controls";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_SPEED_LIMIT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
 import { collision } from "./animator/index";
-import { Game } from "./game";
+import { Game, Options } from "./game";
 
 function validDirectionChange(snake: Snake, newDirection: Point): boolean {
     // Check to make sure that the new direction isn't 180 degrees in the opposite of 
@@ -157,7 +157,7 @@ function showNotification(text: string, time: number = 5000) {
 }
 
 function onMaxSpeed(game: Game) {
-    if (game.options.numPlayers === 1) {
+    if (!game.player2) {
         showNotification('Player has hit max speed!');
     } else {
         if (game.player1.speed === GAME_SPEED_LIMIT) {
@@ -168,10 +168,26 @@ function onMaxSpeed(game: Game) {
     }
 }
 
+function setTopScoreText(score: number) {
+    const topScoreValueEl: HTMLElement = document.querySelector('#top-score-value');
+    topScoreValueEl.textContent = `${score}`;
+}
+
+function setOptions(options: Options) {
+    const startingSpeedEl: HTMLSelectElement = document.querySelector('#startingSpeed');
+    const numFoodEl: HTMLSelectElement = document.querySelector('#numFood');
+    const collideWithWallEl: HTMLSelectElement = document.querySelector('#collideWithWall');
+    const displayGridEl: HTMLSelectElement = document.querySelector('#displayGrid');
+    startingSpeedEl.value = `${options.startingSpeed}`;
+    numFoodEl.value = `${options.numFood}`;
+    collideWithWallEl.value = `${options.collideWithWall}`;
+    displayGridEl.value = `${options.displayGrid}`;
+}
+
 export {
     validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall,
     collidedWithWall, updateScoreText,
     setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn,
     slideOut, fadeOut, showNotification,
-    applySlidIn, applySlidOut, onMaxSpeed
+    applySlidIn, applySlidOut, onMaxSpeed, setTopScoreText, setOptions
 }

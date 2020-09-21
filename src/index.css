@@ -148,10 +148,9 @@ section h2 {
 }
 
 
-.button.singleplayer-button, .button.multiplayer-button {
+.button.singleplayer-button, .button.multiplayer-button, .button.play-button  {
     font-size: 3em;
 }
-
 
 .button.back-button {
     z-index: 2;

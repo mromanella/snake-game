@@ -1,66 +1,20 @@
 import "./index.css";
-import { Options, createGame, startGame, stopGame, Game, pauseGame, resumeGame } from "./game";
-import { hideElement, showElement, showNotification, slideIn, slideOut } from "./utils";
+import { Game, Options } from "./game";
+import { hideElement, setTopScoreText, setOptions, showElement, showNotification, slideIn, slideOut } from "./utils";
 import { getKeyboardController, Key, keyNames } from "./animator/src/keyboard/index";
 import { register } from "./animator/src/events";
-import { GAME_FINISH_EVENT } from "./constants";
-
-// Set up db
-let db: IDBDatabase;
-let objectStore: IDBObjectStore;
-const HIGH_SCORES_DB_NAME = 'high_scores';
-const HIGH_SCORE_KEY = 'top';
-const request = window.indexedDB.open("snake_game");
-request.onsuccess = (event: any) => {
-    db = event.target.result;
-    const gHS = getHighScore();
-    gHS.onsuccess = (event: any) => {
-        const highScore = event.target.result['score'];
-        setHighScoreText(highScore);
-    }
-    gHS.onerror = (event: any) => {
-        objectStore.transaction.oncomplete = () => {
-            addHighScore(0);
-            setHighScoreText(0);
-        }
-    }
-}
-request.onerror = () => {
-    alert('Need access to database to work.');
-}
-request.onupgradeneeded = (event: any) => {
-    db = event.target.result;
-    objectStore = db.createObjectStore(HIGH_SCORES_DB_NAME, { keyPath: 'name' });
-    objectStore.transaction.oncomplete = () => {
-        addHighScore(0);
-        setHighScoreText(0);
-    }
-}
-
-function addHighScore(score: number) {
-    const transaction = db.transaction(HIGH_SCORES_DB_NAME, 'readwrite').objectStore(HIGH_SCORES_DB_NAME);
-    transaction.put({ name: HIGH_SCORE_KEY, score: score });
-}
-
-function getHighScore(): IDBRequest {
-    const transaction = db.transaction(HIGH_SCORES_DB_NAME, 'readonly').objectStore(HIGH_SCORES_DB_NAME);
-    return transaction.get(HIGH_SCORE_KEY);
-}
-
-
-function setHighScoreText(score: number) {
-    topScoreValueEl.textContent = `${score}`;
-}
+import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER } from "./constants";
+import { getTopScore, saveTopScore, getOptions, saveOptions } from "./db";
 
 // Get ref to all menu items
-const topScoreValueEl: HTMLElement = document.querySelector('#top-score-value');
 const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
 
 const gameOptionsEl: HTMLElement = document.querySelector('#options');
-const snakeSpeedEl: HTMLSelectElement = document.querySelector('#snakeSpeed');
+const startingSpeedEl: HTMLSelectElement = document.querySelector('#startingSpeed');
 const numFoodEl: HTMLSelectElement = document.querySelector('#numFood');
 const collideWithWallEl: HTMLSelectElement = document.querySelector('#collideWithWall');
 const displayGridEl: HTMLSelectElement = document.querySelector('#displayGrid');
+const playButtonEl: HTMLElement = document.querySelector('#play-button');
 
 const rulesEl: HTMLSelectElement = document.querySelector('#info');
 
@@ -71,46 +25,78 @@ const goBackButtonEl: HTMLSelectElement = document.querySelector('#go-back-butto
 const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-section');
 
 let currentScreen = mainMenuEl;
+let previousScreen = mainMenuEl;
+let playerMode = SINGLEPLAYER;
 
-function transitionScreen(from: HTMLElement, to: HTMLElement) {
+function transitionScreen(from: HTMLElement, to: HTMLElement, showBack: boolean = false) {
     slideOut(from);
     slideIn(to);
+    previousScreen = from;
     currentScreen = to;
+    if (showBack) {
+        setTimeout(showElement, 800, goBackButtonEl);
+    } else {
+        hideElement(goBackButtonEl);
+    }
+}
+
+function toOptions(from: HTMLElement, playerMode: string) {
+    getOptions(playerMode).onsuccess = (event: any) => {
+        const options = event.target.result.options;
+        setOptions(options);
+    };
+    transitionScreen(from, gameOptionsEl, true);
 }
 
 goBackButtonEl.addEventListener('click', () => {
-    transitionScreen(currentScreen, mainMenuEl);
-    hideElement(goBackButtonEl);
+    transitionScreen(currentScreen, previousScreen);
 });
+
+playButtonEl.addEventListener('click', () => {
+    const options: Options = {
+        numFood: Number(numFoodEl.value),
+        collideWithWall: collideWithWallEl.value === 'true' ? true : false,
+        displayGrid: displayGridEl.value === 'true' ? true : false,
+        startingSpeed: Number(startingSpeedEl.value)
+    }
+    saveOptions(playerMode, options);
+    const game = create(options);
+    if (playerMode === SINGLEPLAYER) {
+        game.setupSingleplayer();
+    } else {
+        game.setupMultiplayer();
+    }
+    transitionScreen(gameOptionsEl, playAreaEl);
+    game.start();
+
+})
 
 document.getElementById('options-button').addEventListener('click', (event: MouseEvent) => {
     transitionScreen(mainMenuEl, gameOptionsEl);
-    setTimeout(showElement, 800, goBackButtonEl);
 })
 
 document.getElementById('info-button').addEventListener('click', (event: MouseEvent) => {
     transitionScreen(mainMenuEl, rulesEl);
-    setTimeout(showElement, 800, goBackButtonEl);
 })
 
 function togglePause(game: Game) {
     if (game.running) {
-        pauseGame(game);
+        game.pause();
         showElement(pausedSectionEl);
     } else {
         hideElement(pausedSectionEl);
-        resumeGame(game);
+        game.resume();
     }
 }
 
 function onFinish(game: Game, pKey: Key) {
-    if (game.options.numPlayers === 1) {
-        getHighScore().onsuccess = (event: any) => {
+    if (!game.isMultiplayer()) {
+        getTopScore().onsuccess = (event: any) => {
             const highScore = event.target.result['score'];
             const score = game.player1.score;
             if (score > highScore) {
-                addHighScore(score);
-                setHighScoreText(score);
+                saveTopScore(score);
+                setTopScoreText(score);
                 showNotification('New top score!');
             }
         }
@@ -118,41 +104,29 @@ function onFinish(game: Game, pKey: Key) {
     pKey.setLocked(true);
 }
 
-function run(options: Options) {
-    const game = createGame(options);
+function create(options: Options): Game {
+    const game = new Game(options);
+
     const kbController = getKeyboardController();
     const pKey = new Key(keyNames.P, [() => {
         togglePause(game);
     }]);
     kbController.addKey(pKey)
     register(GAME_FINISH_EVENT, onFinish, game, pKey);
-    transitionScreen(mainMenuEl, playAreaEl);
-    startGame(game);
     document.querySelector('#quit-button').addEventListener('click', () => {
-        stopGame(game);
+        game.stop();
         transitionScreen(playAreaEl, mainMenuEl);
     });
+    return game;
 }
 
 // Game starts here
 document.getElementById('singleplayer-button').addEventListener('click', (event: MouseEvent) => {
-    const options: Options = {
-        numPlayers: 1,
-        numFood: Number(numFoodEl.value),
-        collideWithWall: collideWithWallEl.value === 'true' ? true : false,
-        displayGrid: displayGridEl.value === 'true' ? true : false,
-        snakeSpeed: Number(snakeSpeedEl.value)
-    }
-    run(options);
+    playerMode = SINGLEPLAYER;
+    toOptions(mainMenuEl, playerMode);
 })
 
 document.getElementById('multiplayer-button').addEventListener('click', (event: MouseEvent) => {
-    const options: Options = {
-        numPlayers: 2,
-        numFood: Number(numFoodEl.value),
-        collideWithWall: collideWithWallEl.value === 'true' ? true : false,
-        displayGrid: displayGridEl.value === 'true' ? true : false,
-        snakeSpeed: Number(snakeSpeedEl.value)
-    }
-    run(options);
+    playerMode = MULTIPLAYER;
+    toOptions(mainMenuEl, playerMode);
 })

@@ -18,18 +18,12 @@ export class Player {
     keyPresses: Key[] = [];
     score: number = 0;
     alive: boolean = true;
-    initialSpeed: number;
     speed: number;
     shouldUpdate: boolean = false;
 
-    constructor(num: number, initialSpeed: number, snake: Snake, keys: Key[]) {
+    constructor(num: number, startingSpeed: number, snake: Snake, keys: Key[]) {
         this.num = num;
-        this.initialSpeed = initialSpeed;
-        if (initialSpeed === -1) {
-            this.speed = INITIAL_GAME_SPEED;
-        } else {
-            this.speed = initialSpeed;
-        }
+        this.speed = startingSpeed;
         this.snake = snake;
         this.keys = keys;
         this.initKeys();
@@ -104,9 +98,7 @@ export class Player {
         // }
         // Increment if some were eaten
         this.updateScore();
-        if (this.initialSpeed === -1) {
-            this.updateGameSpeed();
-        }
+        this.updateGameSpeed();
         updateScoreText(this.num, this.score);
     }
 
