@@ -3,8 +3,8 @@ const path = require('path');
 module.exports = {
     entry: './src/index.ts',
     output: {
-        // filename: 'bundle.js',
-        filename: 'bundle-[contenthash].js',
+        filename: 'bundle.js',
+        // filename: 'bundle-[contenthash].js',
         path: path.resolve(__dirname, 'dist')
     },
     module: {
