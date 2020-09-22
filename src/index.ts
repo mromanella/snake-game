@@ -157,7 +157,7 @@ addHoverShake(playButtonEl);
 infoButtonEl.addEventListener('click', (event: MouseEvent) => {
     transitionScreen(mainMenuEl, infoSectionEl, true);
 })
-addHoverShake(playButtonEl);
+addHoverShake(infoButtonEl);
 
 singlePlayerButtonEl.addEventListener('click', (event: MouseEvent) => {
     playerMode = SINGLEPLAYER;
