@@ -44,6 +44,13 @@ function fadeOut(element: HTMLElement) {
     element.classList.add('fade-out');
 }
 
+function shake(element: HTMLElement) {
+    element.classList.add('shake');
+    setTimeout(() => {
+        element.classList.remove('shake')
+    }, 400);
+}
+
 export {
     hideElement,
     showElement,
@@ -51,5 +58,6 @@ export {
     slideOutTop,
     applySlidInTop,
     applySlidOutTop,
-    fadeOut
+    fadeOut,
+    shake
 }

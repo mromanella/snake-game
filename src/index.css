@@ -3,13 +3,16 @@
 }
 
 body {
-    background-color: #f7f7f7;
+    background-color: #dadada;
 }
 
 .top-container {
     margin: 0 10%;
     display: flex;
     flex-direction: column;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
 }
 
 header {
@@ -103,7 +106,7 @@ section h2 {
 
 .info ul li {
     padding: 10px;
-    font-size: 1.25em;
+    font-size: 1.15em;
     font-weight: 700;
     font-family: 'Courier New', Courier, monospace;
 }
@@ -147,6 +150,7 @@ section h2 {
 .button:hover {
     /* color: rgb(206, 85, 85); */
     color: rgba(253, 159, 36, 0.712);
+    animation: shake-anim 400ms cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
 }
 
 .button:hover>span>span {
@@ -162,6 +166,7 @@ section h2 {
 
 .button.back-button {
     z-index: 2;
+    padding: 5px;
 }
 
 .play-area {
@@ -209,7 +214,7 @@ section h2 {
     /* opacity: .6; */
     left: 0;
     height: 100%;
-    border-radius: 2px;
+    border-radius: 5px;
 }
 
 .restart-button,
@@ -223,7 +228,37 @@ section h2 {
     color: rgb(252, 177, 80);
 }
 
+.player1-controls {
+    font-size: 1.5em;
+    width: 45%;
+    justify-self: flex-start;
+    padding: 5px;
+}
+
+.player2-controls {
+    font-size: 1.5em;
+    width: 45%;
+    justify-self: flex-end;
+    color: blue;
+    padding: 5px;
+}
+
 .space-between {
     display: flex;
     justify-content: space-between;
+}
+
+@keyframes shake-anim {
+    0% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(1deg);
+    }
+    75% {
+        transform: rotate(-1deg);
+    }
+    100% {
+        transform: rotateZ(0deg);
+    }
 }

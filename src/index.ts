@@ -6,6 +6,7 @@ import { register } from "./animator/src/events";
 import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER } from "./constants";
 import { getTopScore, saveTopScore, getOptions, saveOptions } from "./db";
 import { elements } from "./animator/index";
+import { hideElement, showElement } from "./animator/src/elements/elements";
 
 // Get ref to all menu items
 const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
@@ -26,6 +27,8 @@ const gameFinishedEl: HTMLElement = document.querySelector('#game-finished-secti
 const restartButtonEl: HTMLElement = document.querySelector('#restart-button');
 const mainMenuButtonGameFinishedEl: HTMLElement = document.querySelector('#main-menu-button-game-finished');
 const mainMenuButtonPausedEl: HTMLElement = document.querySelector('#main-menu-button-paused');
+
+const player2ControlsEl: HTMLElement = document.querySelector('#player2-controls');
 
 const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-section');
 
@@ -83,6 +86,12 @@ playButtonEl.addEventListener('click', () => {
         startingSpeed: Number(startingSpeedEl.value)
     }
     saveOptions(playerMode, options);
+
+    if (playerMode === SINGLEPLAYER) {
+        hideElement(player2ControlsEl);
+    } else {
+        showElement(player2ControlsEl);
+    }
 
     const game = new Game(playerMode, options);
 
