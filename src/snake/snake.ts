@@ -32,7 +32,7 @@ export class Snake {
 
     update() {
         // Preserve last path
-        this.setLastPath()
+        this.setLastPath();
 
         // Move the tail to the front
         let head = this.getHead();

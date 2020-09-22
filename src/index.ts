@@ -18,7 +18,8 @@ const collideWithWallEl: HTMLSelectElement = document.querySelector('#collideWit
 const displayGridEl: HTMLSelectElement = document.querySelector('#displayGrid');
 const playButtonEl: HTMLElement = document.querySelector('#play-button');
 
-const rulesEl: HTMLSelectElement = document.querySelector('#info');
+const infoSectionEl: HTMLSelectElement = document.querySelector('#info');
+const infoButtonEl: HTMLElement = document.getElementById('info-button');
 
 const playAreaEl: HTMLSelectElement = document.querySelector('#play-area');
 
@@ -28,6 +29,9 @@ const restartButtonEl: HTMLElement = document.querySelector('#restart-button');
 const mainMenuButtonGameFinishedEl: HTMLElement = document.querySelector('#main-menu-button-game-finished');
 const mainMenuButtonPausedEl: HTMLElement = document.querySelector('#main-menu-button-paused');
 
+const singlePlayerButtonEl: HTMLElement = document.getElementById('singleplayer-button');
+const multiplayerButtonEl: HTMLElement = document.getElementById('multiplayer-button');
+
 const player2ControlsEl: HTMLElement = document.querySelector('#player2-controls');
 
 const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-section');
@@ -35,10 +39,6 @@ const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-secti
 let currentScreen = mainMenuEl;
 let previousScreen = mainMenuEl;
 let playerMode = SINGLEPLAYER;
-
-goBackButtonEl.addEventListener('click', () => {
-    transitionScreen(currentScreen, previousScreen);
-});
 
 function transitionScreen(from: HTMLElement, to: HTMLElement, showBack: boolean = false) {
     elements.slideOutTop(from);
@@ -64,19 +64,65 @@ function toMainMenu(from: HTMLElement) {
     transitionScreen(from, mainMenuEl);
 }
 
+
+function togglePause(game: Game) {
+    if (game.running) {
+        game.pause();
+        elements.showElement(pausedSectionEl);
+    } else {
+        elements.hideElement(pausedSectionEl);
+        game.resume();
+    }
+}
+
+function onFinish(game: Game, pKey: Key) {
+    if (!game.isMultiplayer()) {
+        getTopScore().onsuccess = (event: any) => {
+            const highScore = event.target.result['score'];
+            const score = game.player1.score;
+            if (score > highScore) {
+                saveTopScore(score);
+                setTopScoreText(score);
+                showNotification('New top score!');
+            }
+        }
+    }
+    game.pause();
+    pKey.setLocked(true);
+    elements.showElement(gameFinishedEl);
+}
+
+function addHoverShake(el: HTMLElement) {
+    el.addEventListener('mouseenter', () => {
+        elements.shake(el, true);
+    })
+    el.addEventListener('mouseleave', () => {
+        elements.removeShake(el);
+    })
+}
+
+goBackButtonEl.addEventListener('click', () => {
+    transitionScreen(currentScreen, previousScreen);
+});
+addHoverShake(goBackButtonEl);
+
 restartButtonEl.addEventListener('click', () => {
     elements.hideElement(gameFinishedEl);
     playButtonEl.click();
 })
+addHoverShake(restartButtonEl);
 
 mainMenuButtonGameFinishedEl.addEventListener('click', () => {
     elements.hideElement(gameFinishedEl);
     toMainMenu(currentScreen);
 })
+addHoverShake(mainMenuButtonGameFinishedEl);
+
 mainMenuButtonPausedEl.addEventListener('click', () => {
     elements.hideElement(pausedSectionEl);
     toMainMenu(currentScreen);
 })
+addHoverShake(mainMenuButtonPausedEl);
 
 playButtonEl.addEventListener('click', () => {
     const options: Options = {
@@ -106,45 +152,21 @@ playButtonEl.addEventListener('click', () => {
     transitionScreen(currentScreen, playAreaEl);
     game.start();
 })
+addHoverShake(playButtonEl);
 
-document.getElementById('info-button').addEventListener('click', (event: MouseEvent) => {
-    transitionScreen(mainMenuEl, rulesEl, true);
+infoButtonEl.addEventListener('click', (event: MouseEvent) => {
+    transitionScreen(mainMenuEl, infoSectionEl, true);
 })
+addHoverShake(playButtonEl);
 
-function togglePause(game: Game) {
-    if (game.running) {
-        game.pause();
-        elements.showElement(pausedSectionEl);
-    } else {
-        elements.hideElement(pausedSectionEl);
-        game.resume();
-    }
-}
-
-function onFinish(game: Game, pKey: Key) {
-    if (!game.isMultiplayer()) {
-        getTopScore().onsuccess = (event: any) => {
-            const highScore = event.target.result['score'];
-            const score = game.player1.score;
-            if (score > highScore) {
-                saveTopScore(score);
-                setTopScoreText(score);
-                showNotification('New top score!');
-            }
-        }
-    }
-    game.pause();
-    pKey.setLocked(true);
-    elements.showElement(gameFinishedEl);
-}
-
-// Game starts here
-document.getElementById('singleplayer-button').addEventListener('click', (event: MouseEvent) => {
+singlePlayerButtonEl.addEventListener('click', (event: MouseEvent) => {
     playerMode = SINGLEPLAYER;
     toOptions(mainMenuEl);
 })
+addHoverShake(singlePlayerButtonEl);
 
-document.getElementById('multiplayer-button').addEventListener('click', (event: MouseEvent) => {
+multiplayerButtonEl.addEventListener('click', (event: MouseEvent) => {
     playerMode = MULTIPLAYER;
     toOptions(mainMenuEl);
 })
+addHoverShake(multiplayerButtonEl);

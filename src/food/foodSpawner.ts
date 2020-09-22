@@ -64,15 +64,18 @@ export default class FoodSpawner {
     }
 
     removeEatenFoods(snakeHead: SnakePart): boolean {
-        const filtered = [];
+        const notEaten = [];
+        const eaten = [];
         for (let i = 0; i < this.foods.length; i++) {
             let food = this.foods[i];
-            if (!food.isEaten(snakeHead)) {
-                filtered.push(food);
+            if (food.isEaten(snakeHead)) {
+                eaten.push(food);
+            } else {
+                notEaten.push(food);
             }
         }
-        let numEaten = this.foods.length - filtered.length;
-        this.foods = filtered;
+        let numEaten = eaten.length;
+        this.foods = notEaten;
         return numEaten > 0;
     }
 

@@ -146,7 +146,6 @@ section h2 {
 .button:hover {
     /* color: rgb(206, 85, 85); */
     color: rgba(253, 159, 36, 0.712);
-    animation: shake-anim 400ms cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
 }
 
 .button:hover>span>span {
@@ -242,19 +241,4 @@ section h2 {
 .space-between {
     display: flex;
     justify-content: space-between;
-}
-
-@keyframes shake-anim {
-    0% {
-        transform: rotate(0deg);
-    }
-    25% {
-        transform: rotate(1deg);
-    }
-    75% {
-        transform: rotate(-1deg);
-    }
-    100% {
-        transform: rotateZ(0deg);
-    }
 }

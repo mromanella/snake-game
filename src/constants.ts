@@ -8,10 +8,10 @@ const FOOD_OFFSET = 5;
 const SINGLEPLAYER = 'singleplayer';
 const MULTIPLAYER = 'multiplayer';
 
-let INITIAL_GAME_SPEED = 300;
+let INITIAL_GAME_SPEED = 350;
 const GAME_SPEED_DELTA = 10;
 const GAME_SPEED_LIMIT: number = 30;
-const GAME_SPEEDS = [300, 200, 100, 50, 25];
+const GAME_SPEEDS = [350, 250, 150, 50, 30];
 
 const PLAYER_MAX_SPEED_EVENT = 'playerMaxSpeed';
 const PLAYER_DEATH_EVENT = 'playerDeath';

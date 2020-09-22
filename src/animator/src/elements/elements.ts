@@ -44,11 +44,15 @@ function fadeOut(element: HTMLElement) {
     element.classList.add('fade-out');
 }
 
-function shake(element: HTMLElement) {
-    element.classList.add('shake');
-    setTimeout(() => {
-        element.classList.remove('shake')
-    }, 400);
+function shake(element: HTMLElement, inifinite: boolean = false) {
+    element.classList.add('shake-infinite');
+    if (!inifinite) {
+        setTimeout(removeShake, 400, element);
+    }
+}
+
+function removeShake(element: HTMLElement) {
+    element.classList.remove('shake-infinite');
 }
 
 export {
@@ -59,5 +63,6 @@ export {
     applySlidInTop,
     applySlidOutTop,
     fadeOut,
-    shake
+    shake, 
+    removeShake
 }
