@@ -3,7 +3,7 @@ import { KeyboardController, getKeyboardController, lockKeys, unlockKeys } from 
 import { Animator, Rectangle } from "./animator/src/models";
 import FoodSpawner from "./food/foodSpawner";
 
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT, PLAYER_DEATH_EVENT, GAME_FINISH_EVENT, PLAYER_MAX_SPEED_EVENT, GAME_SPEEDS } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT, PLAYER_DEATH_EVENT, GAME_FINISH_EVENT, PLAYER_MAX_SPEED_EVENT, GAME_SPEEDS, MULTIPLAYER } from "./constants";
 import { Snake } from "./snake/snake";
 import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, onMaxSpeed } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
@@ -28,26 +28,33 @@ class Game {
     options: Options;
     running: boolean = false;
     interval: number;
+    playerMode: string;
     grid: Rectangle[] = [];
 
-    constructor(options: Options) {
+    constructor(playerMode: string, options: Options) {
+        this.playerMode = playerMode;
         this.options = options;
         this.foodSpawner = new FoodSpawner(options.numFood, CANVAS_WIDTH, CANVAS_HEIGHT);
         this.populateGrid();
         this.loop = this.loop.bind(this);
         this.draw = this.draw.bind(this);
+        if (this.isMultiplayer()) {
+            this.setupMultiplayer();
+        } else {
+            this.setupSingleplayer();
+        }
     }
 
     populateGrid() {
         for (let x = 0; x < CANVAS_WIDTH; x += SnakePart.partWidth) {
             for (let y = 0; y < CANVAS_HEIGHT; y += SnakePart.partWidth) {
-                this.grid.push(new Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f7f7f7'));
+                this.grid.push(new Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f0f0f0'));
             }
         }
     }
 
     isMultiplayer() {
-        return !(this.player2 === undefined);
+        return this.playerMode === MULTIPLAYER;
     }
 
     loop() {

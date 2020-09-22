@@ -5,6 +5,7 @@ import { getDirectionForKey, UP, DOWN, LEFT } from "./controls";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_SPEED_LIMIT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
 import { collision } from "./animator/index";
+import { elements } from "./animator/index";
 import { Game, Options } from "./game";
 
 function validDirectionChange(snake: Snake, newDirection: Point): boolean {
@@ -81,78 +82,31 @@ function goThroughWall(snake: Snake) {
 }
 
 function getScoreTag(num: number) {
-    let scoreTag = document.getElementById('player1-score');
-    if (num === 2) {
-        scoreTag = document.getElementById('player2-score');
-    }
+    let scoreTag = document.getElementById('player-score');
     return scoreTag;
 }
 
 function initScoreTag(num: number) {
     const scoreTag = getScoreTag(num);
-    showElement(scoreTag);
+    elements.showElement(scoreTag);
 }
 
 function hideScoreTag(num: number) {
     const scoreTag = getScoreTag(num);
-    hideElement(scoreTag);
+    elements.hideElement(scoreTag);
 }
 
 function updateScoreText(num: number, score: number) {
     const scoreTag = getScoreTag(num);
-    scoreTag.innerText = `Player ${num}: ${score}`;
-}
-
-function hideElement(element: HTMLElement) {
-    element.classList.add('hidden');
-}
-
-function showElement(element: HTMLElement) {
-    element.classList.remove('hidden');
-}
-
-function slideIn(element: HTMLElement) {
-    element.classList.remove('slide-in');
-    element.classList.remove('slide-out');
-    element.classList.remove('slid-out');
-    element.classList.add('slide-in');
-    setTimeout(() => {
-        element.classList.add('slid-in');
-        element.classList.remove('slide-in');
-    }, 800);
-}
-
-function slideOut(element: HTMLElement) {
-    element.classList.remove('slide-out');
-    element.classList.remove('slide-in');
-    element.classList.remove('slid-in');
-    element.classList.add('slide-out');
-    setTimeout(() => {
-        element.classList.add('slid-out');
-        element.classList.remove('slide-out');
-    }, 800);
-}
-
-function applySlidIn(element: HTMLElement) {
-    element.classList.remove('slid-out');
-    element.classList.add('slid-in');
-}
-
-function applySlidOut(element: HTMLElement) {
-    element.classList.remove('slid-in');
-    element.classList.add('slid-out');
-}
-
-function fadeOut(element: HTMLElement) {
-    element.classList.add('fade-out');
+    scoreTag.innerText = `Score: ${score}`;
 }
 
 function showNotification(text: string, time: number = 5000) {
     const notificationEl = document.getElementById('notification');
     notificationEl.innerText = text;
-    slideIn(notificationEl);
+    elements.slideInTop(notificationEl);
     setTimeout(() => {
-        slideOut(notificationEl);
+        elements.slideOutTop(notificationEl);
     }, time);
 }
 
@@ -187,7 +141,6 @@ function setOptions(options: Options) {
 export {
     validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall,
     collidedWithWall, updateScoreText,
-    setCanvasBorder, initScoreTag, hideScoreTag, hideElement, showElement, slideIn,
-    slideOut, fadeOut, showNotification,
-    applySlidIn, applySlidOut, onMaxSpeed, setTopScoreText, setOptions
+    setCanvasBorder, initScoreTag, hideScoreTag, showNotification,
+    onMaxSpeed, setTopScoreText, setOptions
 }

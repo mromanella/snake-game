@@ -1,10 +1,11 @@
 import "./index.css";
 import { Game, Options } from "./game";
-import { hideElement, setTopScoreText, setOptions, showElement, showNotification, slideIn, slideOut } from "./utils";
+import { setTopScoreText, setOptions, showNotification } from "./utils";
 import { getKeyboardController, Key, keyNames } from "./animator/src/keyboard/index";
 import { register } from "./animator/src/events";
 import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER } from "./constants";
 import { getTopScore, saveTopScore, getOptions, saveOptions } from "./db";
+import { elements } from "./animator/index";
 
 // Get ref to all menu items
 const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
@@ -21,6 +22,10 @@ const rulesEl: HTMLSelectElement = document.querySelector('#info');
 const playAreaEl: HTMLSelectElement = document.querySelector('#play-area');
 
 const goBackButtonEl: HTMLSelectElement = document.querySelector('#go-back-button');
+const gameFinishedEl: HTMLElement = document.querySelector('#game-finished-section');
+const restartButtonEl: HTMLElement = document.querySelector('#restart-button');
+const mainMenuButtonGameFinishedEl: HTMLElement = document.querySelector('#main-menu-button-game-finished');
+const mainMenuButtonPausedEl: HTMLElement = document.querySelector('#main-menu-button-paused');
 
 const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-section');
 
@@ -28,19 +33,23 @@ let currentScreen = mainMenuEl;
 let previousScreen = mainMenuEl;
 let playerMode = SINGLEPLAYER;
 
+goBackButtonEl.addEventListener('click', () => {
+    transitionScreen(currentScreen, previousScreen);
+});
+
 function transitionScreen(from: HTMLElement, to: HTMLElement, showBack: boolean = false) {
-    slideOut(from);
-    slideIn(to);
+    elements.slideOutTop(from);
+    elements.slideInTop(to);
     previousScreen = from;
     currentScreen = to;
     if (showBack) {
-        setTimeout(showElement, 800, goBackButtonEl);
+        setTimeout(elements.showElement, 800, goBackButtonEl);
     } else {
-        hideElement(goBackButtonEl);
+        elements.hideElement(goBackButtonEl);
     }
 }
 
-function toOptions(from: HTMLElement, playerMode: string) {
+function toOptions(from: HTMLElement) {
     getOptions(playerMode).onsuccess = (event: any) => {
         const options = event.target.result.options;
         setOptions(options);
@@ -48,9 +57,23 @@ function toOptions(from: HTMLElement, playerMode: string) {
     transitionScreen(from, gameOptionsEl, true);
 }
 
-goBackButtonEl.addEventListener('click', () => {
-    transitionScreen(currentScreen, previousScreen);
-});
+function toMainMenu(from: HTMLElement) {
+    transitionScreen(from, mainMenuEl);
+}
+
+restartButtonEl.addEventListener('click', () => {
+    elements.hideElement(gameFinishedEl);
+    playButtonEl.click();
+})
+
+mainMenuButtonGameFinishedEl.addEventListener('click', () => {
+    elements.hideElement(gameFinishedEl);
+    toMainMenu(currentScreen);
+})
+mainMenuButtonPausedEl.addEventListener('click', () => {
+    elements.hideElement(pausedSectionEl);
+    toMainMenu(currentScreen);
+})
 
 playButtonEl.addEventListener('click', () => {
     const options: Options = {
@@ -60,31 +83,31 @@ playButtonEl.addEventListener('click', () => {
         startingSpeed: Number(startingSpeedEl.value)
     }
     saveOptions(playerMode, options);
-    const game = create(options);
-    if (playerMode === SINGLEPLAYER) {
-        game.setupSingleplayer();
-    } else {
-        game.setupMultiplayer();
-    }
-    transitionScreen(gameOptionsEl, playAreaEl);
+
+    const game = new Game(playerMode, options);
+
+    const kbController = getKeyboardController();
+    const pKey = new Key(keyNames.P, [() => {
+        togglePause(game);
+    }]);
+    kbController.addKey(pKey)
+
+    register(GAME_FINISH_EVENT, onFinish, game, pKey);
+
+    transitionScreen(currentScreen, playAreaEl);
     game.start();
-
-})
-
-document.getElementById('options-button').addEventListener('click', (event: MouseEvent) => {
-    transitionScreen(mainMenuEl, gameOptionsEl);
 })
 
 document.getElementById('info-button').addEventListener('click', (event: MouseEvent) => {
-    transitionScreen(mainMenuEl, rulesEl);
+    transitionScreen(mainMenuEl, rulesEl, true);
 })
 
 function togglePause(game: Game) {
     if (game.running) {
         game.pause();
-        showElement(pausedSectionEl);
+        elements.showElement(pausedSectionEl);
     } else {
-        hideElement(pausedSectionEl);
+        elements.hideElement(pausedSectionEl);
         game.resume();
     }
 }
@@ -101,32 +124,18 @@ function onFinish(game: Game, pKey: Key) {
             }
         }
     }
+    game.pause();
     pKey.setLocked(true);
-}
-
-function create(options: Options): Game {
-    const game = new Game(options);
-
-    const kbController = getKeyboardController();
-    const pKey = new Key(keyNames.P, [() => {
-        togglePause(game);
-    }]);
-    kbController.addKey(pKey)
-    register(GAME_FINISH_EVENT, onFinish, game, pKey);
-    document.querySelector('#quit-button').addEventListener('click', () => {
-        game.stop();
-        transitionScreen(playAreaEl, mainMenuEl);
-    });
-    return game;
+    elements.showElement(gameFinishedEl);
 }
 
 // Game starts here
 document.getElementById('singleplayer-button').addEventListener('click', (event: MouseEvent) => {
     playerMode = SINGLEPLAYER;
-    toOptions(mainMenuEl, playerMode);
+    toOptions(mainMenuEl);
 })
 
 document.getElementById('multiplayer-button').addEventListener('click', (event: MouseEvent) => {
     playerMode = MULTIPLAYER;
-    toOptions(mainMenuEl, playerMode);
+    toOptions(mainMenuEl);
 })

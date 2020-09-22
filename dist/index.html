@@ -13,13 +13,10 @@
 
 <body>
     <div class="top-container">
-        <section id="paused-section" class="paused-section hidden">
-            <h1 id="paused-text" class="paused-text">PAUSED</h1>
-            <div style="font-size: 1.5em;color: white;" class="paused-text">Press P to unpause</div>
-        </section>
+
         <header>
             <h1 class="main-title">Snake Game!</h1>
-            <div id="notification" class="slid-out notification"></div>
+            <div id="notification" class="slid-out-top notification"></div>
             <div class="top-score space-around">
                 <h3 for="top-score-value">Top Score: <span id="top-score-value" class="top-score-value">0</span></h3>
             </div>
@@ -34,25 +31,24 @@
                         title="Try to get the top score! Use W, S, A, D to move.">Singleplayer<span><span></span></span></button>
                     <button id="multiplayer-button" class="button multiplayer-button"
                         title=" 2 player games end when one player causes the other to collide with the wall or snake body. The points don't matter! First player is the black snake and uses W,S,A,D to move. The second player is the blue snake and uses the arrow keys to move.">Multiplayer<span><span></span></span></button>
-                    <button id="options-button" class="button">Options<span><span></span></span></button>
-                    <button id="info-button" class="button">Info<span><span></span></span></button>
+                    <button id="info-button" style="font-size: 2em;" class="button">Info<span><span></span></span></button>
                 </section>
 
-                <section id="options" class="options slid-out top-0">
+                <section id="options" class="options slid-out-top top-0">
                     <div class="content">
                         <h2>Options</h2>
                         <div>
                             <div
-                            title="How fast the snakes move from the beginning. Snakes will get faster as they eat.">
-                            <label for="startingSpeed">Starting speed: </label>
-                            <select id="startingSpeed" class="startingSpeed option" name="startingSpeed">
-                                <option value="0">1</option>
-                                <option value="1">2</option>
-                                <option value="2">3</option>
-                                <option value="3">4</option>
-                                <option value="4">5</option>
-                            </select>
-                        </div>
+                                title="How fast the snakes move from the beginning. Snakes will get faster as they eat.">
+                                <label for="startingSpeed">Starting speed: </label>
+                                <select id="startingSpeed" class="startingSpeed option" name="startingSpeed">
+                                    <option value="0">1</option>
+                                    <option value="1">2</option>
+                                    <option value="2">3</option>
+                                    <option value="3">4</option>
+                                    <option value="4">5</option>
+                                </select>
+                            </div>
                             <div
                                 title="Sets the number of food which is on the board at a time. More food will spawn once all food has been cleared.">
                                 <label for="numFood">Number of food: </label>
@@ -89,7 +85,7 @@
                     </div>
                 </section>
 
-                <section id="info" class="info slid-out top-0">
+                <section id="info" class="info slid-out-top top-0">
                     <div class="content">
                         <h2>Info</h2>
                         <ul>
@@ -116,15 +112,26 @@
                     </div>
                 </section>
 
-                <section id="play-area" class="slid-out top-0">
-                    <button id="quit-button" class="back-button button top-0" style="left: 0;font-weight: bold">Quit
-                        game<span><span></span></span></button>
+                <section id="play-area" class="slid-out-top top-0 play-area">
+
+                    <section id="game-finished-section" class="game-finished-section hidden">
+                        <h1 id="game-finished-text" class="game-finished-text">Game Over</h1>
+                        <button id="restart-button" class="button restart-button"
+                            title="Restart with same options.">Restart<span><span></span></span></button>
+                        <button id="main-menu-button-game-finished" class="main-menu-button button">Main menu<span><span></span></span></button>
+                    </section>
+
+                    <section id="paused-section" class="paused-section hidden">
+                        <h1 id="paused-text" class="paused-text">PAUSED</h1>
+                        <div style="font-size: 1.5em;color: white;" class="paused-text">Press P to unpause</div>
+                        <button id="main-menu-button-paused" class="main-menu-button button">Main menu<span><span></span></span></button>
+                    </section>
+
                     <div class="content">
                         <canvas id="game-window" class="game-window" height="400" width="400"></canvas>
                         <div class="score-area">
-                            <div>Press P to pause</div>
-                            <div id="player1-score" class="hidden">Player 1: 0</div>
-                            <div id="player2-score" class="hidden">Player 2: 0</div>
+                            <div id="player-score" class="player-score hidden">Score: 0</div>
+                            <div class="p-to-pause">Press P to pause</div>
                         </div>
                     </div>
                 </section>

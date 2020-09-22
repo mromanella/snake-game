@@ -24,7 +24,7 @@ function getOptions(playerMode: string): IDBRequest {
 
 // Set up db
 let db: IDBDatabase;
-const TOP_SCORES_DB_NAME = 'high_scores';
+const TOP_SCORES_DB_NAME = 'top_scores';
 const TOP_SCORE_KEY = 'top';
 const OPTIONS_DB_NAME = 'options';
 const request = window.indexedDB.open("snake_game", 2);
