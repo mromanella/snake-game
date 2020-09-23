@@ -1,15 +1,15 @@
 import { Player } from "./player";
-import { KeyboardController, getKeyboardController, lockKeys, unlockKeys } from "./animator/src/keyboard/index";
-import { Animator, Rectangle } from "./animator/src/models";
 import FoodSpawner from "./food/foodSpawner";
 
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT, PLAYER_DEATH_EVENT, GAME_FINISH_EVENT, PLAYER_MAX_SPEED_EVENT, GAME_SPEEDS, MULTIPLAYER } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_ID, FPS, GAME_SPEED_LIMIT, PLAYER_DEATH_EVENT, GAME_FINISH_EVENT, PLAYER_MAX_SPEED_EVENT, GAME_SPEEDS, MULTIPLAYER, FOOD_PICKUP } from "./constants";
 import { Snake } from "./snake/snake";
 import { setCanvasBorder, initScoreTag, hideScoreTag, updateScoreText, onMaxSpeed } from "./utils";
 import { getPlayer1Keys, getPlayer2Keys } from "./controls";
 import { SnakePart } from "./snake/snake-part";
-import { register, trigger } from "./animator/src/events";
+import { animator,  keyboard, models, events, sounds } from "./animator/index";
 
+const eventController = events.getEventController();
+const soundController = sounds.getSoundController();
 
 interface Options {
     numFood: number,
@@ -23,13 +23,13 @@ class Game {
     player1: Player;
     player2: Player;
     foodSpawner: FoodSpawner;
-    controller: KeyboardController;
-    animator: Animator;
+    controller: keyboard.KeyboardController;
+    animator: animator.Animator;
     options: Options;
     running: boolean = false;
     interval: number;
     playerMode: string;
-    grid: Rectangle[] = [];
+    grid: models.Rectangle[] = [];
 
     constructor(playerMode: string, options: Options) {
         this.playerMode = playerMode;
@@ -48,7 +48,7 @@ class Game {
     populateGrid() {
         for (let x = 0; x < CANVAS_WIDTH; x += SnakePart.partWidth) {
             for (let y = 0; y < CANVAS_HEIGHT; y += SnakePart.partWidth) {
-                this.grid.push(new Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f0f0f0'));
+                this.grid.push(new models.Rectangle(x, y, SnakePart.partWidth, SnakePart.partWidth, '#f0f0f0'));
             }
         }
     }
@@ -66,6 +66,7 @@ class Game {
         const p1Ate = this.foodSpawner.removeEatenFoods(this.player1.snake.getHead());
         if (p1Ate) {
             this.player1.grow();
+            eventController.trigger(FOOD_PICKUP);
         }
         const snakeParts = [...this.player1.snake.path];
         if (this.isMultiplayer()) {
@@ -73,6 +74,7 @@ class Game {
             const p2Ate = this.foodSpawner.removeEatenFoods(this.player2.snake.getHead());
             if (p2Ate) {
                 this.player2.grow();
+                eventController.trigger(FOOD_PICKUP);
             }
             snakeParts.push(...this.player2.snake.path);
         }
@@ -81,7 +83,7 @@ class Game {
         }
     }
 
-    draw(ctx: CanvasRenderingContext2D, animator: Animator) {
+    draw(ctx: CanvasRenderingContext2D, animator: animator.Animator) {
         if (this.options.displayGrid) {
             for (let piece of this.grid) {
                 piece.draw(ctx, false);
@@ -119,14 +121,15 @@ class Game {
         if (this.isMultiplayer()) {
             keys.push(...this.player2.keys);
         }
-        this.controller = getKeyboardController(keys);
+        this.controller = keyboard.getKeyboardController(keys);
 
-        register(PLAYER_MAX_SPEED_EVENT, onMaxSpeed, this);
-        register(PLAYER_DEATH_EVENT, () => {
+        eventController.register(PLAYER_MAX_SPEED_EVENT, onMaxSpeed, this);
+        eventController.register(PLAYER_DEATH_EVENT, () => {
             this.running = false;
-            trigger(GAME_FINISH_EVENT);
+            soundController.play(PLAYER_DEATH_EVENT);
+            eventController.trigger(GAME_FINISH_EVENT);
         });
-        this.animator = new Animator(CANVAS_ID, FPS, this.draw, true);
+        this.animator = new animator.Animator(CANVAS_ID, FPS, this.draw, true);
         setCanvasBorder(this.options, this.animator);
     }
 
@@ -157,11 +160,11 @@ class Game {
         this.animator.resume();
         if (!this.isMultiplayer()) {
             this.player1.shouldUpdate = true;
-            unlockKeys(this.player1.keys);
+            keyboard.unlockKeys(this.player1.keys);
         }
         else {
-            unlockKeys(this.player1.keys);
-            unlockKeys(this.player2.keys);
+            keyboard.unlockKeys(this.player1.keys);
+            keyboard.unlockKeys(this.player2.keys);
             this.player1.shouldUpdate = true;
             this.player2.shouldUpdate = true;
         }
@@ -172,11 +175,11 @@ class Game {
         this.running = false;
         this.animator.pause();
         if (!this.isMultiplayer()) {
-            lockKeys(this.player1.keys);
+            keyboard.lockKeys(this.player1.keys);
             this.player1.shouldUpdate = false;
         } else {
-            lockKeys(this.player1.keys);
-            lockKeys(this.player2.keys);
+            keyboard.lockKeys(this.player1.keys);
+            keyboard.lockKeys(this.player2.keys);
             this.player1.shouldUpdate = false;
             this.player2.shouldUpdate = false;
         }

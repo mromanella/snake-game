@@ -1,6 +1,6 @@
 import { Snake } from "./snake/snake";
-import { Key, unlockKeys, lockKeys } from "./animator/src/keyboard/index";
-import { INITIAL_GAME_SPEED, GAME_SPEED_DELTA, GAME_SPEED_LIMIT, PLAYER_MAX_SPEED_EVENT, PLAYER_DEATH_EVENT } from "./constants";
+import Key from "./animator/src/keyboard/key";
+import { GAME_SPEED_DELTA, GAME_SPEED_LIMIT, PLAYER_MAX_SPEED_EVENT, PLAYER_DEATH_EVENT } from "./constants";
 import {
     changeSnakeDirection, collidedWithBody,
     goThroughWall, collidedWithWall,
@@ -9,6 +9,8 @@ import {
 import { Game } from "./game";
 import { collision, events } from "./animator/index";
 import { Point } from "./animator/src/models";
+
+const eventController = events.getEventController();
 
 export class Player {
 
@@ -75,14 +77,14 @@ export class Player {
         for (let snakePart of this.snake.path) {
             snakePart.color = 'red';
         }
-        events.trigger(PLAYER_DEATH_EVENT);
+        eventController.trigger(PLAYER_DEATH_EVENT);
     }
 
     updateGameSpeed() {
         if (this.speed > GAME_SPEED_LIMIT) {
             this.speed -= GAME_SPEED_DELTA;
             if (this.speed === GAME_SPEED_LIMIT) {
-                events.trigger(PLAYER_MAX_SPEED_EVENT);
+                eventController.trigger(PLAYER_MAX_SPEED_EVENT);
             }
         }
     }

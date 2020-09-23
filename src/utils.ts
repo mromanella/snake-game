@@ -1,28 +1,25 @@
 import { Snake } from "./snake/snake";
-import { Point, Animator } from "./animator/src/models";
-import Key from "./animator/src/keyboard/key";
 import { getDirectionForKey, UP, DOWN, LEFT } from "./controls";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_SPEED_LIMIT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
-import { collision } from "./animator/index";
-import { elements } from "./animator/index";
 import { Game, Options } from "./game";
+import { models, keyboard, collision, animator, elements } from "./animator/index";
 
-function validDirectionChange(snake: Snake, newDirection: Point): boolean {
+function validDirectionChange(snake: Snake, newDirection: models.Point): boolean {
     // Check to make sure that the new direction isn't 180 degrees in the opposite of 
     // our current heading
     // OR
     // Check to make sure that the keypress isn't for the direction we are already going
     // If either than skip
     let sum = newDirection.add(snake.direction);
-    if ((sum.equals(new Point(0, 0))) ||
+    if ((sum.equals(new models.Point(0, 0))) ||
         (newDirection.equals(snake.direction))) {
         return false;
     }
     return true;
 }
 
-function changeSnakeDirection(snake: Snake, key: Key): boolean {
+function changeSnakeDirection(snake: Snake, key: keyboard.Key): boolean {
     if (!key) {
         return false;
     }
@@ -52,15 +49,15 @@ function collidedWithBody(head: SnakePart, snake: Snake): boolean {
     return false;
 }
 
-function setCollideWithWallBorder(animator: Animator) {
+function setCollideWithWallBorder(animator: animator.Animator) {
     animator.canvasEl.classList.remove('dashed');
 }
 
-function setPassThroughWallBorder(animator: Animator) {
+function setPassThroughWallBorder(animator: animator.Animator) {
     animator.canvasEl.classList.add('dashed');
 }
 
-function setCanvasBorder(options: any, animator: Animator) {
+function setCanvasBorder(options: any, animator: animator.Animator) {
     if (options.collideWithWall) {
         setCollideWithWallBorder(animator);
     } else {
@@ -99,6 +96,11 @@ function hideScoreTag(num: number) {
 function updateScoreText(num: number, score: number) {
     const scoreTag = getScoreTag(num);
     scoreTag.innerText = `Score: ${score}`;
+}
+
+function getTopScoreTag() {
+    const scoreTag = document.querySelector('#top-score-value');
+    return scoreTag;
 }
 
 function showNotification(text: string, time: number = 5000) {
@@ -140,7 +142,7 @@ function setOptions(options: Options) {
 
 export {
     validDirectionChange, changeSnakeDirection, collidedWithBody, goThroughWall,
-    collidedWithWall, updateScoreText,
+    collidedWithWall, updateScoreText, getTopScoreTag,
     setCanvasBorder, initScoreTag, hideScoreTag, showNotification,
     onMaxSpeed, setTopScoreText, setOptions
 }

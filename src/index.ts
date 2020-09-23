@@ -1,12 +1,9 @@
 import "./index.css";
 import { Game, Options } from "./game";
-import { setTopScoreText, setOptions, showNotification } from "./utils";
-import { getKeyboardController, Key, keyNames } from "./animator/src/keyboard/index";
-import { register } from "./animator/src/events";
-import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER } from "./constants";
-import { getTopScore, saveTopScore, getOptions, saveOptions } from "./db";
-import { elements } from "./animator/index";
-import { hideElement, showElement } from "./animator/src/elements/elements";
+import { setTopScoreText, setOptions, showNotification, getTopScoreTag, updateScoreText } from "./utils";
+import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER, MENU_CLICK, MENU_HOVER, FOOD_PICKUP, PLAYER_DEATH_EVENT, BG_MUSIC } from "./constants";
+import { getTopScore, saveTopScore, getOptions, saveOptions, haveDBAccess } from "./db";
+import { elements, keyboard, events, sounds } from "./animator/index";
 
 // Get ref to all menu items
 const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
@@ -36,9 +33,39 @@ const player2ControlsEl: HTMLElement = document.querySelector('#player2-controls
 
 const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-section');
 
-let currentScreen = mainMenuEl;
-let previousScreen = mainMenuEl;
+const startSectionEl: HTMLElement = document.querySelector('#start-button-section');
+const startButtonEl: HTMLElement = document.querySelector('#start-button');
+
+let currentScreen = startSectionEl;
+let previousScreen = startSectionEl;
 let playerMode = SINGLEPLAYER;
+
+const eventController = events.getEventController();
+const soundController = sounds.getSoundController();
+
+soundController.add(MENU_HOVER, 'assets/sounds/menu/beep.wav');
+soundController.add(MENU_CLICK, 'assets/sounds/menu/confirmbeep.wav');
+soundController.add(FOOD_PICKUP, 'assets/sounds/snake/fire.wav');
+soundController.add(PLAYER_DEATH_EVENT, 'assets/sounds/snake/oops.wav');
+soundController.add(BG_MUSIC, 'assets/sounds/bg/IntroLoop.wav').loop = true;
+soundController.get(BG_MUSIC).volume = 0.5;
+
+function playFoodPickupSound() {
+    soundController.pause(FOOD_PICKUP);
+    soundController.scrub(FOOD_PICKUP);
+    soundController.play(FOOD_PICKUP);
+}
+
+function pauseBGMusic() {
+    soundController.pause(BG_MUSIC)
+    soundController.scrub(BG_MUSIC);
+}
+
+startButtonEl.addEventListener('click', () => {
+    playMenuClickSound();
+    transitionScreen(startSectionEl, mainMenuEl);
+})
+addHoverShakeSound(startButtonEl);
 
 function transitionScreen(from: HTMLElement, to: HTMLElement, showBack: boolean = false) {
     elements.slideOutTop(from);
@@ -67,33 +94,58 @@ function toMainMenu(from: HTMLElement) {
 
 function togglePause(game: Game) {
     if (game.running) {
+        soundController.get(BG_MUSIC).volume = 0.25;
         game.pause();
         elements.showElement(pausedSectionEl);
     } else {
+        soundController.get(BG_MUSIC).volume = 0.5;
         elements.hideElement(pausedSectionEl);
         game.resume();
     }
 }
 
-function onFinish(game: Game, pKey: Key) {
+function onFinish(game: Game, pKey: keyboard.Key) {
     if (!game.isMultiplayer()) {
-        getTopScore().onsuccess = (event: any) => {
-            const highScore = event.target.result['score'];
+        if (haveDBAccess()) {
+            getTopScore().onsuccess = (event: any) => {
+                const highScore = event.target.result['score'];
+                const score = game.player1.score;
+                if (score > highScore) {
+                    saveTopScore(score);
+                    setTopScoreText(score);
+                    showNotification('New top score!');
+                }
+            }
+        } else {
             const score = game.player1.score;
+            const highScore = Number(getTopScoreTag().textContent);
             if (score > highScore) {
-                saveTopScore(score);
                 setTopScoreText(score);
                 showNotification('New top score!');
             }
         }
     }
+    pauseBGMusic();
     game.pause();
     pKey.setLocked(true);
     elements.showElement(gameFinishedEl);
 }
 
-function addHoverShake(el: HTMLElement) {
+function playMenuHighlightSound() {
+    soundController.pause(MENU_HOVER);
+    soundController.scrub(MENU_HOVER);
+    soundController.play(MENU_HOVER);
+}
+
+function playMenuClickSound() {
+    soundController.pause(MENU_CLICK);
+    soundController.scrub(MENU_CLICK);
+    soundController.play(MENU_CLICK);
+}
+
+function addHoverShakeSound(el: HTMLElement) {
     el.addEventListener('mouseenter', () => {
+        playMenuHighlightSound();
         elements.shake(el, true);
     })
     el.addEventListener('mouseleave', () => {
@@ -102,71 +154,86 @@ function addHoverShake(el: HTMLElement) {
 }
 
 goBackButtonEl.addEventListener('click', () => {
+    playMenuClickSound();
     transitionScreen(currentScreen, previousScreen);
 });
-addHoverShake(goBackButtonEl);
+addHoverShakeSound(goBackButtonEl);
 
 restartButtonEl.addEventListener('click', () => {
+    playMenuClickSound();
     elements.hideElement(gameFinishedEl);
     playButtonEl.click();
 })
-addHoverShake(restartButtonEl);
+addHoverShakeSound(restartButtonEl);
 
 mainMenuButtonGameFinishedEl.addEventListener('click', () => {
+    playMenuClickSound();
+    pauseBGMusic();
     elements.hideElement(gameFinishedEl);
     toMainMenu(currentScreen);
 })
-addHoverShake(mainMenuButtonGameFinishedEl);
+addHoverShakeSound(mainMenuButtonGameFinishedEl);
 
 mainMenuButtonPausedEl.addEventListener('click', () => {
+    playMenuClickSound();
+    pauseBGMusic();
     elements.hideElement(pausedSectionEl);
     toMainMenu(currentScreen);
 })
-addHoverShake(mainMenuButtonPausedEl);
+addHoverShakeSound(mainMenuButtonPausedEl);
 
 playButtonEl.addEventListener('click', () => {
+    playMenuClickSound();
+    updateScoreText(1, 0);
     const options: Options = {
         numFood: Number(numFoodEl.value),
         collideWithWall: collideWithWallEl.value === 'true' ? true : false,
         displayGrid: displayGridEl.value === 'true' ? true : false,
         startingSpeed: Number(startingSpeedEl.value)
     }
-    saveOptions(playerMode, options);
+    if (haveDBAccess()) {
+        saveOptions(playerMode, options);
+    }
 
     if (playerMode === SINGLEPLAYER) {
-        hideElement(player2ControlsEl);
+        elements.hideElement(player2ControlsEl);
     } else {
-        showElement(player2ControlsEl);
+        elements.showElement(player2ControlsEl);
     }
 
     const game = new Game(playerMode, options);
 
-    const kbController = getKeyboardController();
-    const pKey = new Key(keyNames.P, [() => {
+    const kbController = keyboard.getKeyboardController();
+    const pKey = new keyboard.Key(keyboard.keyNames.P, [() => {
         togglePause(game);
     }]);
     kbController.addKey(pKey)
 
-    register(GAME_FINISH_EVENT, onFinish, game, pKey);
+    eventController.register(GAME_FINISH_EVENT, onFinish, game, pKey);
+    eventController.register(FOOD_PICKUP, playFoodPickupSound)
 
     transitionScreen(currentScreen, playAreaEl);
+    soundController.play(BG_MUSIC);
     game.start();
 })
-addHoverShake(playButtonEl);
+addHoverShakeSound(playButtonEl);
 
 infoButtonEl.addEventListener('click', (event: MouseEvent) => {
+    playMenuClickSound();
     transitionScreen(mainMenuEl, infoSectionEl, true);
 })
-addHoverShake(infoButtonEl);
+addHoverShakeSound(infoButtonEl);
 
 singlePlayerButtonEl.addEventListener('click', (event: MouseEvent) => {
+    playMenuClickSound();
     playerMode = SINGLEPLAYER;
     toOptions(mainMenuEl);
 })
-addHoverShake(singlePlayerButtonEl);
+addHoverShakeSound(singlePlayerButtonEl);
 
 multiplayerButtonEl.addEventListener('click', (event: MouseEvent) => {
+    playMenuClickSound();
     playerMode = MULTIPLAYER;
     toOptions(mainMenuEl);
 })
-addHoverShake(multiplayerButtonEl);
+addHoverShakeSound(multiplayerButtonEl);

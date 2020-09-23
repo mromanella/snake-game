@@ -23,6 +23,7 @@ function getOptions(playerMode: string): IDBRequest {
 }
 
 // Set up db
+let dbSuccessful = true;
 let db: IDBDatabase;
 const TOP_SCORES_DB_NAME = 'top_scores';
 const TOP_SCORE_KEY = 'top';
@@ -65,7 +66,8 @@ request.onsuccess = (event: any) => {
     }
 }
 request.onerror = () => {
-    alert('Need access to database to work.');
+    dbSuccessful = false;
+    // alert('Need access to database to work.');
 }
 request.onupgradeneeded = (event: any) => {
     db = event.target.result;
@@ -77,9 +79,14 @@ request.onupgradeneeded = (event: any) => {
     }
 }
 
+function haveDBAccess() {
+    return dbSuccessful;
+}
+
 export {
     saveTopScore,
     getTopScore,
     saveOptions,
-    getOptions
+    getOptions,
+    haveDBAccess
 }
