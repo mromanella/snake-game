@@ -53,11 +53,11 @@ const eventController = events.getEventController();
 const soundController = sounds.getSoundController();
 
 function initSounds() {
-    soundController.add(MENU_HOVER, 'assets/sounds/menu/beep.wav').volume(MENU_HOVER, 0.25);
-    soundController.add(MENU_CLICK, 'assets/sounds/menu/confirmbeep.wav').volume(MENU_CLICK, 0.25);;
-    soundController.add(FOOD_PICKUP, 'assets/sounds/snake/fire.wav').volume(FOOD_PICKUP, 0.25);;
-    soundController.add(PLAYER_DEATH_EVENT, 'assets/sounds/snake/oops.wav').volume(PLAYER_DEATH_EVENT, 0.25);;
-    soundController.add(BG_MUSIC, 'assets/sounds/bg/IntroLoop.wav').loop(BG_MUSIC).volume(BG_MUSIC, 0.25);
+    soundController.add(MENU_HOVER, 'assets/sounds/menu/beep.wav').volume(MENU_HOVER, 0.15);
+    soundController.add(MENU_CLICK, 'assets/sounds/menu/confirmbeep.wav').volume(MENU_CLICK, 0.15);;
+    soundController.add(FOOD_PICKUP, 'assets/sounds/snake/fire.wav').volume(FOOD_PICKUP, 0.15);;
+    soundController.add(PLAYER_DEATH_EVENT, 'assets/sounds/snake/oops.wav').volume(PLAYER_DEATH_EVENT, 0.15);;
+    soundController.add(BG_MUSIC, 'assets/sounds/bg/IntroLoop.wav').loop(BG_MUSIC).volume(BG_MUSIC, 0.15);
 }
 
 function initButtonsHoverSound() {
@@ -122,7 +122,7 @@ function togglePause(game: Game) {
         game.pause();
         elements.showElement(pausedSectionEl);
     } else {
-        soundController.volume(BG_MUSIC, 0.25);
+        soundController.volume(BG_MUSIC, 0.15);
         elements.hideElement(pausedSectionEl);
         game.resume();
     }
@@ -216,7 +216,7 @@ playButtonEl.addEventListener('click', () => {
     eventController.register(FOOD_PICKUP, playFoodPickupSound)
 
     transitionScreen(currentScreen, playAreaEl);
-    soundController.volume(BG_MUSIC, 0.25).play(BG_MUSIC);
+    soundController.volume(BG_MUSIC, 0.15).play(BG_MUSIC);
     game.start();
 });
 
