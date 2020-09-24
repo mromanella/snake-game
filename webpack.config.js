@@ -7,6 +7,10 @@ module.exports = {
         // filename: 'bundle-[contenthash].js',
         path: path.resolve(__dirname, 'dist')
     },
+    devServer: {
+        contentBase: path.join(__dirname, 'dist'),
+        port: 8080
+    },
     module: {
         rules: [{
             test: /\.css$/,
