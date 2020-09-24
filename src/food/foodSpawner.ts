@@ -3,7 +3,7 @@ import { Circle, GameObject } from '../animator/src/models';
 import { collision } from '../animator/index';
 import { SnakePart } from '../snake/snake-part';
 import { randomBetween } from '../animator/src/utils';
-import { FOOD_OFFSET } from '../constants';
+import { FOOD_OFFSET, PART_WIDTH } from '../constants';
 
 export default class FoodSpawner {
 
@@ -27,8 +27,8 @@ export default class FoodSpawner {
         let newFoodY = randomBetween(0, yMax);
         // This calculation is to make sure the food in placed on a place that is divisible by 10 and
         // also offset by 5 which makes the box and food line up right.
-        food.x = newFoodX - (newFoodX % 20) + FOOD_OFFSET;
-        food.y = newFoodY - (newFoodY % 20) + FOOD_OFFSET;
+        food.x = newFoodX - (newFoodX % PART_WIDTH) + FOOD_OFFSET;
+        food.y = newFoodY - (newFoodY % PART_WIDTH) + FOOD_OFFSET;
         return food;
     }
 
