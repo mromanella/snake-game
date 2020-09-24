@@ -1,5 +1,6 @@
 import { Circle, GameObject } from "../animator/src/models";
 import { collision } from "../animator/index";
+import { FOOD_RADIUS } from "../constants";
 
 /**
  * What the snake eats.
@@ -7,7 +8,7 @@ import { collision } from "../animator/index";
 export class Food extends Circle {
 
     constructor(x: number, y: number) {
-        super(x, y, 4, 'orange');
+        super(x, y, FOOD_RADIUS, 'orange');
     }
 
     isEaten(item: GameObject): boolean {

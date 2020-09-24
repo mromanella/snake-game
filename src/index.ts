@@ -1,7 +1,7 @@
 import "./index.css";
 import { Game, Options } from "./game";
 import { setTopScoreText, setOptions, showNotification, getTopScoreTag, updateScoreText } from "./utils";
-import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER, MENU_CLICK, MENU_HOVER, FOOD_PICKUP, PLAYER_DEATH_EVENT, BG_MUSIC } from "./constants";
+import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER, MENU_CLICK, MENU_HOVER, FOOD_PICKUP, PLAYER_DEATH_EVENT, BG_MUSIC, GAME_SPEEDS, BG_MUSIC_SPEEDS } from "./constants";
 import { getTopScore, saveTopScore, getOptions, saveOptions, haveDBAccess } from "./db";
 import { elements, keyboard, events, sounds } from "./animator/index";
 
@@ -53,11 +53,11 @@ const eventController = events.getEventController();
 const soundController = sounds.getSoundController();
 
 function initSounds() {
-    soundController.add(MENU_HOVER, 'assets/sounds/menu/beep.wav').volume(MENU_HOVER, 0.15);
-    soundController.add(MENU_CLICK, 'assets/sounds/menu/confirmbeep.wav').volume(MENU_CLICK, 0.15);;
-    soundController.add(FOOD_PICKUP, 'assets/sounds/snake/fire.wav').volume(FOOD_PICKUP, 0.15);;
-    soundController.add(PLAYER_DEATH_EVENT, 'assets/sounds/snake/oops.wav').volume(PLAYER_DEATH_EVENT, 0.15);;
-    soundController.add(BG_MUSIC, 'assets/sounds/bg/IntroLoop.wav').loop(BG_MUSIC).volume(BG_MUSIC, 0.15);
+    soundController.add(MENU_HOVER, 'assets/sounds/menu/beep.wav').volume(MENU_HOVER, 0.5);
+    soundController.add(MENU_CLICK, 'assets/sounds/menu/confirmbeep.wav').volume(MENU_CLICK, 0.5);
+    soundController.add(FOOD_PICKUP, 'assets/sounds/snake/coin10.wav').volume(FOOD_PICKUP, 0.5);
+    soundController.add(PLAYER_DEATH_EVENT, 'assets/sounds/snake/oops.wav').volume(PLAYER_DEATH_EVENT, 0.5);
+    soundController.add(BG_MUSIC, 'assets/sounds/bg/headinthesand.ogg').loop(BG_MUSIC);
 }
 
 function initButtonsHoverSound() {
@@ -118,11 +118,11 @@ function toMainMenu(from: HTMLElement) {
 
 function togglePause(game: Game) {
     if (game.running) {
-        soundController.volume(BG_MUSIC, 0.05)
+        soundController.volume(BG_MUSIC, 0.5)
         game.pause();
         elements.showElement(pausedSectionEl);
     } else {
-        soundController.volume(BG_MUSIC, 0.15);
+        soundController.volume(BG_MUSIC, 1);
         elements.hideElement(pausedSectionEl);
         game.resume();
     }
@@ -213,10 +213,21 @@ playButtonEl.addEventListener('click', () => {
     kbController.addKey(pKey)
 
     eventController.register(GAME_FINISH_EVENT, onFinish, game, pKey);
-    eventController.register(FOOD_PICKUP, playFoodPickupSound)
+    eventController.register(FOOD_PICKUP, playFoodPickupSound);
+    eventController.register(FOOD_PICKUP, () => {
+        if (!game.isMultiplayer()) {
+            for (let speed of GAME_SPEEDS) {
+                if (game.player1.speed === speed) {
+                    const i = GAME_SPEEDS.indexOf(speed);
+                    soundController.playBackRate(BG_MUSIC, BG_MUSIC_SPEEDS[i]);
+                    break;
+                }
+            } 
+        }
+    })
 
     transitionScreen(currentScreen, playAreaEl);
-    soundController.volume(BG_MUSIC, 0.15).play(BG_MUSIC);
+    soundController.volume(BG_MUSIC, 1).playBackRate(BG_MUSIC, BG_MUSIC_SPEEDS[options.startingSpeed]).play(BG_MUSIC);
     game.start();
 });
 

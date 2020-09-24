@@ -109,8 +109,8 @@ class Game {
         const gameSpeed = GAME_SPEEDS[this.options.startingSpeed];
         const player1Keys = getPlayer1Keys();
         const player2Keys = getPlayer2Keys();
-        const player1Snake = new Snake(200, 150);
-        const player2Snake = new Snake(200, 250, 'blue');
+        const player1Snake = new Snake(200, 140);
+        const player2Snake = new Snake(200, 240, 'blue');
         this.player1 = new Player(1, gameSpeed, player1Snake, player1Keys);
         this.player2 = new Player(2, gameSpeed, player2Snake, player2Keys);
         this.finishSetup();
