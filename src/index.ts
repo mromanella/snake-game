@@ -1,12 +1,11 @@
 import "./index.css";
 import { Game, Options } from "./game";
 import { setTopScoreText, setOptions, showNotification, getTopScoreTag, updateScoreText } from "./utils";
-import { GAME_FINISH_EVENT, MULTIPLAYER, SINGLEPLAYER, MENU_CLICK, MENU_HOVER, FOOD_PICKUP, PLAYER_DEATH_EVENT, BG_MUSIC, GAME_SPEEDS, BG_MUSIC_SPEEDS } from "./constants";
+import { GAME_FINISH_EVENT, SINGLEPLAYER, MENU_CLICK, MENU_HOVER, FOOD_PICKUP, PLAYER_DEATH_EVENT, BG_MUSIC, GAME_SPEEDS, BG_MUSIC_SPEEDS } from "./constants";
 import { getTopScore, saveTopScore, getOptions, saveOptions, haveDBAccess } from "./db";
 import { elements, keyboard, events, sounds } from "./animator/index";
 
 // Get ref to all menu items
-const mainMenuEl: HTMLElement = document.querySelector('#main-menu');
 
 const gameOptionsEl: HTMLElement = document.querySelector('#options');
 const startingSpeedEl: HTMLSelectElement = document.querySelector('#startingSpeed');
@@ -20,15 +19,11 @@ const gameFinishedEl: HTMLElement = document.querySelector('#game-finished-secti
 
 const playButtonEl: HTMLElement = document.querySelector('#play-button');
 const infoButtonEl: HTMLElement = document.getElementById('info-button');
-const goBackButtonEl: HTMLSelectElement = document.querySelector('#go-back-button');
 const restartButtonEl: HTMLElement = document.querySelector('#restart-button');
-const mainMenuButtonGameFinishedEl: HTMLElement = document.querySelector('#main-menu-button-game-finished');
-const mainMenuButtonPausedEl: HTMLElement = document.querySelector('#main-menu-button-paused');
+const optionsButtonGameFinishedEl: HTMLElement = document.querySelector('#options-button-game-finished');
+const optionsButtonPausedEl: HTMLElement = document.querySelector('#options-button-paused');
 const startButtonEl: HTMLElement = document.querySelector('#start-button');
-const singlePlayerButtonEl: HTMLElement = document.getElementById('singleplayer-button');
-const multiplayerButtonEl: HTMLElement = document.getElementById('multiplayer-button');
 
-const player2ControlsEl: HTMLElement = document.querySelector('#player2-controls');
 const pausedSectionEl: HTMLSelectElement = document.querySelector('#paused-section');
 
 const startSectionEl: HTMLElement = document.querySelector('#start-button-section');
@@ -36,13 +31,10 @@ const startSectionEl: HTMLElement = document.querySelector('#start-button-sectio
 const buttons = [
     playButtonEl,
     infoButtonEl,
-    goBackButtonEl,
     restartButtonEl,
-    mainMenuButtonGameFinishedEl,
-    mainMenuButtonPausedEl,
-    startButtonEl,
-    singlePlayerButtonEl,
-    multiplayerButtonEl
+    optionsButtonGameFinishedEl,
+    optionsButtonPausedEl,
+    startButtonEl
 ]
 
 let currentScreen = startSectionEl;
@@ -92,28 +84,19 @@ function addHoverShakeSound(el: HTMLElement) {
     })
 }
 
-function transitionScreen(from: HTMLElement, to: HTMLElement, showBack: boolean = false) {
+function transitionScreen(from: HTMLElement, to: HTMLElement) {
     elements.slideOutTop(from);
     elements.slideInTop(to);
     previousScreen = from;
     currentScreen = to;
-    if (showBack) {
-        setTimeout(elements.showElement, 800, goBackButtonEl);
-    } else {
-        elements.hideElement(goBackButtonEl);
-    }
 }
 
 function toOptions(from: HTMLElement) {
-    getOptions(playerMode).onsuccess = (event: any) => {
+    getOptions().onsuccess = (event: any) => {
         const options = event.target.result.options;
         setOptions(options);
     };
-    transitionScreen(from, gameOptionsEl, true);
-}
-
-function toMainMenu(from: HTMLElement) {
-    transitionScreen(from, mainMenuEl);
+    transitionScreen(from, gameOptionsEl);
 }
 
 function togglePause(game: Game) {
@@ -129,24 +112,22 @@ function togglePause(game: Game) {
 }
 
 function onFinish(game: Game, pKey: keyboard.Key) {
-    if (!game.isMultiplayer()) {
-        if (haveDBAccess()) {
-            getTopScore().onsuccess = (event: any) => {
-                const highScore = event.target.result['score'];
-                const score = game.player1.score;
-                if (score > highScore) {
-                    saveTopScore(score);
-                    setTopScoreText(score);
-                    showNotification('New top score!');
-                }
-            }
-        } else {
-            const score = game.player1.score;
-            const highScore = Number(getTopScoreTag().textContent);
+    if (haveDBAccess()) {
+        getTopScore().onsuccess = (event: any) => {
+            const highScore = event.target.result['score'];
+            const score = game.score;
             if (score > highScore) {
+                saveTopScore(score);
                 setTopScoreText(score);
                 showNotification('New top score!');
             }
+        }
+    } else {
+        const score = game.score;
+        const highScore = Number(getTopScoreTag().textContent);
+        if (score > highScore) {
+            setTopScoreText(score);
+            showNotification('New top score!');
         }
     }
     stopBGMusic();
@@ -157,37 +138,34 @@ function onFinish(game: Game, pKey: keyboard.Key) {
 
 startButtonEl.addEventListener('click', () => {
     playMenuClickSound();
-    transitionScreen(startSectionEl, mainMenuEl);
-});
-
-goBackButtonEl.addEventListener('click', () => {
-    playMenuClickSound();
-    transitionScreen(currentScreen, previousScreen);
+    playerMode = SINGLEPLAYER;
+    toOptions(startSectionEl);
 });
 
 restartButtonEl.addEventListener('click', () => {
-    playMenuClickSound();
+    // playMenuClickSound();
     elements.hideElement(gameFinishedEl);
     playButtonEl.click();
 });
 
-mainMenuButtonGameFinishedEl.addEventListener('click', () => {
+optionsButtonGameFinishedEl.addEventListener('click', () => {
     playMenuClickSound();
     stopBGMusic();
     elements.hideElement(gameFinishedEl);
-    toMainMenu(currentScreen);
+    toOptions(playAreaEl);;
 });
 
-mainMenuButtonPausedEl.addEventListener('click', () => {
+optionsButtonPausedEl.addEventListener('click', () => {
     playMenuClickSound();
     stopBGMusic();
     elements.hideElement(pausedSectionEl);
-    toMainMenu(currentScreen);
+    toOptions(playAreaEl);
 });
 
 playButtonEl.addEventListener('click', () => {
+    // stopBGMusic();
     playMenuClickSound();
-    updateScoreText(1, 0);
+    updateScoreText(0);
     const options: Options = {
         numFood: Number(numFoodEl.value),
         collideWithWall: collideWithWallEl.value === 'true' ? true : false,
@@ -195,13 +173,7 @@ playButtonEl.addEventListener('click', () => {
         startingSpeed: Number(startingSpeedEl.value)
     }
     if (haveDBAccess()) {
-        saveOptions(playerMode, options);
-    }
-
-    if (playerMode === SINGLEPLAYER) {
-        elements.hideElement(player2ControlsEl);
-    } else {
-        elements.showElement(player2ControlsEl);
+        saveOptions(options);
     }
 
     const game = new Game(playerMode, options);
@@ -215,15 +187,15 @@ playButtonEl.addEventListener('click', () => {
     eventController.register(GAME_FINISH_EVENT, onFinish, game, pKey);
     eventController.register(FOOD_PICKUP, playFoodPickupSound);
     eventController.register(FOOD_PICKUP, () => {
-        if (!game.isMultiplayer()) {
-            for (let speed of GAME_SPEEDS) {
-                if (game.player1.speed === speed) {
-                    const i = GAME_SPEEDS.indexOf(speed);
-                    soundController.playBackRate(BG_MUSIC, BG_MUSIC_SPEEDS[i]);
-                    break;
-                }
-            } 
+
+        for (let speed of GAME_SPEEDS) {
+            if (game.snake.updateSpeed === speed) {
+                const i = GAME_SPEEDS.indexOf(speed);
+                soundController.playBackRate(BG_MUSIC, BG_MUSIC_SPEEDS[i]);
+                break;
+            }
         }
+
     })
 
     transitionScreen(currentScreen, playAreaEl);
@@ -233,19 +205,7 @@ playButtonEl.addEventListener('click', () => {
 
 infoButtonEl.addEventListener('click', (event: MouseEvent) => {
     playMenuClickSound();
-    transitionScreen(mainMenuEl, infoSectionEl, true);
-});
-
-singlePlayerButtonEl.addEventListener('click', (event: MouseEvent) => {
-    playMenuClickSound();
-    playerMode = SINGLEPLAYER;
-    toOptions(mainMenuEl);
-});
-
-multiplayerButtonEl.addEventListener('click', (event: MouseEvent) => {
-    playMenuClickSound();
-    playerMode = MULTIPLAYER;
-    toOptions(mainMenuEl);
+    transitionScreen(startSectionEl, infoSectionEl);
 });
 
 initSounds();

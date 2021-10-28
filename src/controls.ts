@@ -1,5 +1,5 @@
 import Key from "./animator/src/keyboard/key";
-import { Point } from "./animator/src/models";
+import { Point } from "./animator/src/objects/game-objects";
 import { keyNames } from "./animator/src/keyboard/index";
 
 type _DIRECTIONS = {
@@ -34,20 +34,11 @@ function getPlayer1Keys(): Key[] {
     return [wKey, sKey, aKey, dKey];
 }
 
-function getPlayer2Keys(): Key[] {
-    const upArrow = new Key(keyNames.ARROW_UP);
-    const downArrow = new Key(keyNames.ARROW_DOWN);
-    const leftArrow = new Key(keyNames.ARROW_LEFT);
-    const rightArrow = new Key(keyNames.ARROW_RIGHT);
-    return [upArrow, downArrow, leftArrow, rightArrow];
-}
-
 export {
     UP,
     DOWN,
     LEFT,
     RIGHT,
     getDirectionForKey,
-    getPlayer1Keys,
-    getPlayer2Keys
+    getPlayer1Keys
 }

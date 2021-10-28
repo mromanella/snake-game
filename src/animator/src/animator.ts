@@ -1,14 +1,14 @@
-export class Animator {
+import { BoundingBox } from "./objects/index";
+
+export default class Animator {
 
 	canvasEl: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
-	canvasHeight: number;
-	canvasWidth: number;
 	private lastDraw: any;
-	private paused: boolean;
+	private paused: boolean = true;
 	private callback: any;
-	private fps: number;
 	private args: any[];
+	private fps: number;
 	private handle: number;
 
 	/**
@@ -17,15 +17,12 @@ export class Animator {
 	 * @param callbackFunc The function to perform on every draw. Accepts 2dCanvasContext as a param.
 	 * @param FPS The FPS rate. Pass in an int - 30 for 30 FPS.
 	 */
-	constructor(canvasId: string, fps: number, callback: any, startPaused: boolean = false, ...args: any[]) {
-		this.canvasEl = document.querySelector(`#${canvasId}`);
+	constructor(canvasSelector: string, fps: number, callback: any = null, ...args: any[]) {
+		this.canvasEl = document.querySelector(`${canvasSelector}`);
 		this.ctx = this.canvasEl.getContext('2d');
-		this.canvasHeight = this.canvasEl.height;
-		this.canvasWidth = this.canvasEl.width;
 		this.lastDraw = false;
-		this.paused = startPaused;
 		this.callback = callback;
-		this.fps = this.setFPS(fps);
+		this.setFPS(fps);
 		this.args = args;
 
 		this.animate = this.animate.bind(this);
@@ -45,40 +42,91 @@ export class Animator {
 
 			if (diff / this.fps > 1) {
 				// Clear before redraw
-				this.ctx.clearRect(0, 0, this.canvasEl.width, this.canvasEl.height);
+				this.ctx.clearRect(0, 0, this.getWidth(), this.getHeight());
 
 				// Run the callback function to draw
-				this.callback(this.ctx, this, ...this.args);
-				this.lastDraw = runningTime;
+				if (this.callback) {
+					this.callback(this, ...this.args);
+					this.lastDraw = runningTime;
+				}
 			}
 			this.handle = requestAnimationFrame(this.animate);
 		}
 	}
 
-	pause() {
-		this.paused = true;
+	setCallback(callback: Function, ...args: any[]): Animator {
+		this.callback = callback;
+		this.args = args;
+		return this;
 	}
 
-	resume() {
+	pause(): Animator {
+		this.paused = true;
+		return this;
+	}
+
+	resume(): Animator {
 		this.paused = false;
 		this.animate();
+		return this;
 	}
 
 	isPaused() {
 		return this.paused;
 	}
 
-	stop() {
+	stop(): Animator {
 		cancelAnimationFrame(this.handle);
-		this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+		this.ctx.clearRect(0, 0, this.getWidth(), this.getHeight());
+		return this;
 	}
 
 	getFPS() {
 		return 1000 / this.fps;
 	}
 
-	setFPS(fps: number) {
+	setFPS(fps: number): Animator {
 		this.fps = 1000 / fps;
-		return this.fps;
+		return this;
+	}
+
+	setHeight(height: number): Animator {
+		this.canvasEl.height = height;
+		return this;
+	}
+
+	setWidth(width: number): Animator {
+		this.canvasEl.width = width;
+		return this;
+	}
+
+	setDimensions(width: number, height: number): Animator {
+		this.setWidth(width);
+		this.setHeight(height);
+		return this;
+	}
+
+	getHeight() {
+		return this.canvasEl.height;
+	}
+
+	getWidth() {
+		return this.canvasEl.width;
+	}
+
+	getDimensions() {
+		return [this.getWidth(), this.getHeight()];
+	}
+
+	noContextMenu() {
+		this.canvasEl.oncontextmenu = () => {return false};
+	}
+
+	contextMenu() {
+		this.canvasEl.oncontextmenu = () => {return true};
+	}
+
+	gameBounds() {
+		return new BoundingBox(0, 0, this.getWidth(), this.getHeight());
 	}
 }

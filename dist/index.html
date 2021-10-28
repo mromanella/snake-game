@@ -18,7 +18,7 @@
     <div class="top-container">
 
         <header>
-            <h1 class="main-title">Snake Game!</h1>
+            <h1 class="main-title">Snake Game</h1>
             <div id="notification" class="slid-out-top notification"></div>
             <div class="top-score space-around">
                 <h3 for="top-score-value">Top Score: <span id="top-score-value" class="top-score-value">0</span></h3>
@@ -28,18 +28,9 @@
         <main>
             <div class="content">
 
-                <section id="start-button-section" class="start-button button top-0">
+                <section id="start-button-section" class="start-button button top-0" style="display: flex;flex-direction: column;">
                     <button id="start-button" class="button start-button">Start<span><span></span></span></button>
-                </section>
-
-                <button id="go-back-button" class="back-button button hidden top-0"
-                    style="left: 0;font-weight: bold">Back<span><span></span></span></button>
-                <section id="main-menu" class="button-container top-0 slid-out-top">
-                    <button id="singleplayer-button" class="button singleplayer-button"
-                        title="Try to get the top score! Use W, S, A, D to move.">Singleplayer<span><span></span></span></button>
-                    <button id="multiplayer-button" class="button multiplayer-button"
-                        title=" 2 player games end when one player causes the other to collide with the wall or snake body. The points don't matter! First player is the black snake and uses W,S,A,D to move. The second player is the blue snake and uses the arrow keys to move.">Multiplayer<span><span></span></span></button>
-                    <button id="info-button" style="font-size: 2em;" class="button">Info<span><span></span></span></button>
+                    <button id="info-button" style="font-size: 1em;" class="button">Info<span><span></span></span></button>
                 </section>
 
                 <section id="options" class="options slid-out-top top-0">
@@ -108,21 +99,18 @@
                         <h1 id="game-finished-text" class="game-finished-text">Game Over</h1>
                         <button id="restart-button" class="button restart-button"
                             title="Restart with same options.">Restart<span><span></span></span></button>
-                        <button id="main-menu-button-game-finished" class="main-menu-button button">Main menu<span><span></span></span></button>
+                        <button id="options-button-game-finished" class="options-button button">Options<span><span></span></span></button>
                     </section>
 
                     <section id="paused-section" class="paused-section hidden">
                         <h1 id="paused-text" class="paused-text">PAUSED</h1>
                         <div style="font-size: 1.5em;color: white;" class="paused-text">Press P to unpause</div>
-                        <button id="main-menu-button-paused" class="main-menu-button button">Main menu<span><span></span></span></button>
+                        <button id="options-button-paused" class="options-button button">Options<span><span></span></span></button>
                     </section>
 
                     <div class="space-between">
                         <aside id="player1-controls" class="player1-controls">
-                            Player 1: Use W, S, A, D to move
-                        </aside>
-                        <aside id="player2-controls" class="player2-controls">
-                            Player 2: Use UP, DOWN, LEFT, RIGHT arrows to move
+                            Use W, S, A, D to move
                         </aside>
                     </div>
 

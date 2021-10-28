@@ -3,16 +3,16 @@ import { getDirectionForKey, UP, DOWN, LEFT } from "./controls";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_SPEED_LIMIT } from "./constants";
 import { SnakePart } from "./snake/snake-part";
 import { Game, Options } from "./game";
-import { models, keyboard, collision, animator, elements } from "./animator/index";
+import { objects, keyboard, collision, Animator, elements } from "./animator/index";
 
-function validDirectionChange(snake: Snake, newDirection: models.Point): boolean {
-    // Check to make sure that the new direction isn't 180 degrees in the opposite of 
+function validDirectionChange(snake: Snake, newDirection: objects.Point): boolean {
+    // Check to make sure that the new direction isn't 180 degrees in the opposite of
     // our current heading
     // OR
     // Check to make sure that the keypress isn't for the direction we are already going
     // If either than skip
     let sum = newDirection.add(snake.direction);
-    if ((sum.equals(new models.Point(0, 0))) ||
+    if ((sum.equals(new objects.Point(0, 0))) ||
         (newDirection.equals(snake.direction))) {
         return false;
     }
@@ -33,8 +33,8 @@ function changeSnakeDirection(snake: Snake, key: keyboard.Key): boolean {
 }
 
 function collidedWithWall(head: SnakePart): boolean {
-    if (head.x < 0 || head.x >= CANVAS_WIDTH
-        || head.y < 0 || head.y >= CANVAS_HEIGHT) {
+    if (head.location.x < 0 || head.location.x >= CANVAS_WIDTH
+        || head.location.y < 0 || head.location.y >= CANVAS_HEIGHT) {
         return true;
     }
     return false;
@@ -49,15 +49,15 @@ function collidedWithBody(head: SnakePart, snake: Snake): boolean {
     return false;
 }
 
-function setCollideWithWallBorder(animator: animator.Animator) {
+function setCollideWithWallBorder(animator: Animator) {
     animator.canvasEl.classList.remove('dashed');
 }
 
-function setPassThroughWallBorder(animator: animator.Animator) {
+function setPassThroughWallBorder(animator: Animator) {
     animator.canvasEl.classList.add('dashed');
 }
 
-function setCanvasBorder(options: any, animator: animator.Animator) {
+function setCanvasBorder(options: any, animator: Animator) {
     if (options.collideWithWall) {
         setCollideWithWallBorder(animator);
     } else {
@@ -67,34 +67,34 @@ function setCanvasBorder(options: any, animator: animator.Animator) {
 
 function goThroughWall(snake: Snake) {
     if (snake.direction.equals(UP)) {
-        snake.getHead().y = CANVAS_HEIGHT - SnakePart.partWidth;
+        snake.getHead().location.y = CANVAS_HEIGHT - SnakePart.partWidth;
     } else if (snake.direction.equals(DOWN)) {
-        snake.getHead().y = 0;
+        snake.getHead().location.y = 0;
     } else if (snake.direction.equals(LEFT)) {
-        snake.getHead().x = CANVAS_WIDTH - SnakePart.partWidth;
+        snake.getHead().location.x = CANVAS_WIDTH - SnakePart.partWidth;
     } else {
         // RIGHT
-        snake.getHead().x = 0;
+        snake.getHead().location.x = 0;
     }
 }
 
-function getScoreTag(num: number) {
+function getScoreTag() {
     let scoreTag = document.getElementById('player-score');
     return scoreTag;
 }
 
-function initScoreTag(num: number) {
-    const scoreTag = getScoreTag(num);
+function initScoreTag() {
+    const scoreTag = getScoreTag();
     elements.showElement(scoreTag);
 }
 
-function hideScoreTag(num: number) {
-    const scoreTag = getScoreTag(num);
+function hideScoreTag() {
+    const scoreTag = getScoreTag();
     elements.hideElement(scoreTag);
 }
 
-function updateScoreText(num: number, score: number) {
-    const scoreTag = getScoreTag(num);
+function updateScoreText(score: number) {
+    const scoreTag = getScoreTag();
     scoreTag.innerText = `Score: ${score}`;
 }
 
@@ -112,16 +112,8 @@ function showNotification(text: string, time: number = 5000) {
     }, time);
 }
 
-function onMaxSpeed(game: Game) {
-    if (!game.player2) {
-        showNotification('Player has hit max speed!');
-    } else {
-        if (game.player1.speed === GAME_SPEED_LIMIT) {
-            showNotification('Player 1 has hit max speed!');
-        } else {
-            showNotification('Player 2 has hit max speed!');
-        }
-    }
+function onMaxSpeed() {
+    showNotification('Player has hit max speed!');
 }
 
 function setTopScoreText(score: number) {

@@ -222,13 +222,13 @@ section h2 {
 }
 
 .restart-button,
-.main-menu-button,
+.options-button,
 .game-finished-text {
     color: white;
 }
 
 .restart-button:hover,
-.main-menu-button:hover {
+.options-button:hover {
     color: rgb(252, 177, 80);
 }
 

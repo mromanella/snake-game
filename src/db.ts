@@ -1,4 +1,4 @@
-import { MULTIPLAYER, SINGLEPLAYER } from "./constants";
+import { SINGLEPLAYER } from "./constants";
 import { Options } from "./game";
 import { setTopScoreText } from "./utils";
 
@@ -12,14 +12,14 @@ function getTopScore(): IDBRequest {
     return transaction.get(TOP_SCORE_KEY);
 }
 
-function saveOptions(playerMode: string, options: Options) {
+function saveOptions(options: Options) {
     const transaction = db.transaction(OPTIONS_DB_NAME, 'readwrite').objectStore(OPTIONS_DB_NAME);
-    transaction.put({ name: playerMode, options: options });
+    transaction.put({ name: SINGLEPLAYER, options: options });
 }
 
-function getOptions(playerMode: string): IDBRequest {
+function getOptions(): IDBRequest {
     const transaction = db.transaction(OPTIONS_DB_NAME, 'readonly').objectStore(OPTIONS_DB_NAME);
-    return transaction.get(playerMode);
+    return transaction.get(SINGLEPLAYER);
 }
 
 // Set up db
@@ -40,7 +40,7 @@ request.onsuccess = (event: any) => {
             setTopScoreText(0);
         }
     }
-    getOptions(SINGLEPLAYER).onsuccess = (event: any) => {
+    getOptions().onsuccess = (event: any) => {
         const options = event.target.result;
         if (!options) {
             const initialOptions: Options = {
@@ -49,19 +49,7 @@ request.onsuccess = (event: any) => {
                 startingSpeed: 0,
                 displayGrid: true
             }
-            saveOptions(SINGLEPLAYER, initialOptions);
-        }
-    }
-    getOptions(MULTIPLAYER).onsuccess = (event: any) => {
-        const options = event.target.result;
-        if (!options) {
-            const initialOptions: Options = {
-                numFood: 1,
-                collideWithWall: true,
-                startingSpeed: 0,
-                displayGrid: true
-            }
-            saveOptions(MULTIPLAYER, initialOptions);
+            saveOptions(initialOptions);
         }
     }
 }

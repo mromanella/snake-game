@@ -1,18 +1,18 @@
 import { Food } from './food';
-import { Circle, GameObject } from '../animator/src/models';
-import { collision } from '../animator/index';
+import { collision, objects, utils } from '../animator/index';
 import { SnakePart } from '../snake/snake-part';
-import { randomBetween } from '../animator/src/utils';
 import { FOOD_OFFSET, PART_WIDTH } from '../constants';
 
 export default class FoodSpawner {
 
+    ctx: CanvasRenderingContext2D;
     numMax: number;
     xMax: number;
     yMax: number;
     foods: Food[] = [];
 
-    constructor(numMax: number, xMax: number, yMax: number) {
+    constructor(ctx: CanvasRenderingContext2D, numMax: number, xMax: number, yMax: number) {
+        this.ctx = ctx;
         this.numMax = numMax;
         this.xMax = xMax;
         this.yMax = yMax;
@@ -21,45 +21,43 @@ export default class FoodSpawner {
     /**
  * @description Randomizes the location of the food and returns an object
  */
-    randomizeFood(xMax: number, yMax: number): Food {
-        let food = new Food(0, 0);
-        let newFoodX = randomBetween(0, xMax);
-        let newFoodY = randomBetween(0, yMax);
+    randomizeFood(): Food {
+        let food = new Food(this.ctx, 0, 0);
+        let newFoodX = utils.randomBetween(0, this.xMax);
+        let newFoodY = utils.randomBetween(0, this.yMax);
         // This calculation is to make sure the food in placed on a place that is divisible by 10 and
         // also offset by 5 which makes the box and food line up right.
-        food.x = newFoodX - (newFoodX % PART_WIDTH) + FOOD_OFFSET;
-        food.y = newFoodY - (newFoodY % PART_WIDTH) + FOOD_OFFSET;
+        food.location.x = newFoodX - (newFoodX % PART_WIDTH) + FOOD_OFFSET;
+        food.location.y = newFoodY - (newFoodY % PART_WIDTH) + FOOD_OFFSET;
         return food;
     }
 
-    spawn(...notOn: GameObject[]) {
+    spawn(notOn: objects.GameObject[]) {
         if (this.foods.length === this.numMax) {
             return;
         }
-        while (true) {
-            notOn = [...notOn, ...this.foods]
-            let ok = false;
-            let food = this.randomizeFood(this.xMax, this.yMax);
-            // Can't forget about offset
-            let c = new Circle(food.x - FOOD_OFFSET, food.y - FOOD_OFFSET, food.radius, 'white');
+        
+        notOn = [...notOn, ...this.foods];
+        const newFoods = [];
+        while ((this.foods.length + newFoods.length) < this.numMax) {
+            let food = this.randomizeFood();
+            let ok = true;
             for (let gameObj of notOn) {
-                if (!collision.checkCollision(c, gameObj)) {
-                    ok = true;
+                if (food.isEaten(gameObj)) {
+                    ok = false;
                     break;
                 }
             }
             if (ok) {
-                this.foods.push(food);
-                if (this.foods.length === this.numMax) {
-                    break;
-                }
+                newFoods.push(food);
             }
         }
+        this.foods.push(...newFoods);
     }
 
-    draw(ctx: CanvasRenderingContext2D, drawBB: boolean = false) {
+    draw(drawBB: boolean = false) {
         for (let food of this.foods) {
-            food.draw(ctx, true, drawBB);
+            food.draw(drawBB);
         }
     }
 

@@ -1,16 +1,16 @@
-import { Rectangle } from "../animator/src/models";
+import { objects } from "../animator/index";
 import { PART_WIDTH } from "../constants";
 
-export class SnakePart extends Rectangle {
+export class SnakePart extends objects.shapes.Rectangle {
 
     // also height
     static partWidth: number = PART_WIDTH;
 
-    constructor(x: number, y: number, color: string = '#000') {
-        super(x, y, SnakePart.partWidth, SnakePart.partWidth, color);
+    constructor(ctx: CanvasRenderingContext2D, x: number, y: number, color: string = '#000') {
+        super(ctx, x, y, null, SnakePart.partWidth, SnakePart.partWidth, color);
     }
 
     copy(): SnakePart {
-        return new SnakePart(this.x, this.y, this.color);
+        return new SnakePart(this.ctx, this.location.x, this.location.y, this.color);
     }
 }
