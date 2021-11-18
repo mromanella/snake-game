@@ -1,7 +1,9 @@
 import { Food } from './food';
 import { collision, objects, utils } from '../animator/index';
 import { SnakePart } from '../snake/snake-part';
-import { FOOD_OFFSET, PART_WIDTH } from '../constants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, FOOD_OFFSET, PART_WIDTH } from '../constants';
+import { BoundingBox } from '../animator/src/objects/game-objects';
+import { Rectangle } from '../animator/src/objects/shapes';
 
 export default class FoodSpawner {
 
@@ -36,14 +38,15 @@ export default class FoodSpawner {
         if (this.foods.length === this.numMax) {
             return;
         }
-        
+        const gameBB = new Rectangle(this.ctx, 0, 0, null,  CANVAS_WIDTH, CANVAS_HEIGHT, 'black');
+
         notOn = [...notOn, ...this.foods];
         const newFoods = [];
         while ((this.foods.length + newFoods.length) < this.numMax) {
             let food = this.randomizeFood();
             let ok = true;
             for (let gameObj of notOn) {
-                if (food.isEaten(gameObj)) {
+                if (food.isEaten(gameObj) || !collision.checkCollision(gameBB, food)) {
                     ok = false;
                     break;
                 }
